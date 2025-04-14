@@ -1,5 +1,20 @@
 import { NextResponse } from "next/server";
+import mongoose, { ConnectOptions } from "mongoose";
+
+const options: ConnectOptions = {};
 
 export async function GET() {
-  return NextResponse.json({ message: "Hello world!" });
+  try {
+    await mongoose.connect(process.env.MONGODB_URI as string, options);
+    await mongoose.connection.db?.admin().command({ ping: 1 });
+
+    return NextResponse.json({ message: "MongoDB connected successfully" });
+  } catch (error) {
+    return NextResponse.json(
+      { message: "MongoDB connection failed", error },
+      { status: 500 }
+    );
+  } finally {
+    await mongoose.disconnect();
+  }
 }

@@ -1,10 +1,12 @@
-import { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const registerSchema = new Schema({
+const RegisterSchema = new Schema({
   name: { type: String, required: true },
   idClass: { type: Schema.Types.ObjectId, ref: "Class", required: true },
   aniversary: String,
   phone: String,
 });
 
-export default registerSchema;
+const Register = mongoose.model("Register", RegisterSchema);
+
+export default Register;

@@ -1,8 +1,10 @@
-import { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const classSchema = new Schema({
+const ClassSchema = new Schema({
   name: { type: String, required: true },
   group: String,
 });
 
-export default classSchema;
+const Class = mongoose.model("Classe", ClassSchema);
+
+export default Class;

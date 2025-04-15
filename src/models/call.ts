@@ -1,6 +1,6 @@
-import { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const callSchema = new Schema({
+const CallSchema = new Schema({
   idLesson: { type: Schema.Types.ObjectId, ref: "Lesson", required: true },
   idRegister: { type: Schema.Types.ObjectId, ref: "Register", required: true },
   isPresent: { type: Boolean, default: false },
@@ -12,4 +12,6 @@ const callSchema = new Schema({
   ],
 });
 
-export default callSchema;
+const Call = mongoose.model("Call", CallSchema);
+
+export default Call;

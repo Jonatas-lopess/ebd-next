@@ -1,8 +1,10 @@
-import { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const lessonSchema = new Schema({
+const LessonSchema = new Schema({
   title: { type: String, required: true },
   date: { type: Date, required: true },
 });
 
-export default lessonSchema;
+const Lesson = mongoose.model("Lesson", LessonSchema);
+
+export default Lesson;

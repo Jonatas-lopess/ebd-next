@@ -1,9 +1,11 @@
-import { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const scoreSchema = new Schema({
+const ScoreSchema = new Schema({
   title: { type: String, required: true, unique: true },
   type: { type: String, required: true },
   weight: { type: Number, required: true },
 });
 
-export default scoreSchema;
+const Score = mongoose.model("Score", ScoreSchema);
+
+export default Score;

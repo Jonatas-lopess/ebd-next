@@ -8,6 +8,12 @@ export async function GET({ params }: RouteParams) {
     await mongoose.connect(process.env.MONGODB_URI as string);
 
     const { id } = await params;
+    if (mongoose.isValidObjectId(id) === false)
+      return NextResponse.json(
+        { message: "Invalid identifier." },
+        { status: 400 }
+      );
+
     const document = await Class.findById(id);
 
     return NextResponse.json(document ?? {}, { status: 200 });
@@ -26,6 +32,12 @@ export async function PUT(request: Request, { params }: RouteParams) {
     await mongoose.connect(process.env.MONGODB_URI as string);
 
     const { id } = await params;
+    if (mongoose.isValidObjectId(id) === false)
+      return NextResponse.json(
+        { message: "Invalid identifier." },
+        { status: 400 }
+      );
+
     const req = await request.json();
 
     const document = await Class.findById(id);
@@ -54,6 +66,11 @@ export async function DELETE({ params }: RouteParams) {
     await mongoose.connect(process.env.MONGODB_URI as string);
 
     const { id } = await params;
+    if (mongoose.isValidObjectId(id) === false)
+      return NextResponse.json(
+        { message: "Invalid identifier." },
+        { status: 400 }
+      );
 
     const document = await Class.findByIdAndDelete(id);
     if (document === null)
@@ -65,7 +82,10 @@ export async function DELETE({ params }: RouteParams) {
     return NextResponse.json({}, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { message: "An error occurred while processing your request.", error },
+      {
+        message: "An error occurred while processing your request.",
+        error: error,
+      },
       { status: 500 }
     );
   } finally {

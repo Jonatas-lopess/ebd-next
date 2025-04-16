@@ -7,6 +7,7 @@ const RegisterSchema = new Schema({
   phone: String,
 });
 
-const Register = mongoose.model("Register", RegisterSchema);
+const Register =
+  mongoose.models.Register || mongoose.model("Register", RegisterSchema);
 
 export default Register;

@@ -12,6 +12,6 @@ const CallSchema = new Schema({
   ],
 });
 
-const Call = mongoose.model("Call", CallSchema);
+const Call = mongoose.models.Call || mongoose.model("Call", CallSchema);
 
 export default Call;

@@ -6,6 +6,6 @@ const ScoreSchema = new Schema({
   weight: { type: Number, required: true },
 });
 
-const Score = mongoose.model("Score", ScoreSchema);
+const Score = mongoose.models.Score || mongoose.model("Score", ScoreSchema);
 
 export default Score;

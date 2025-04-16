@@ -1,11 +1,21 @@
 import Models from "@api/models";
 import db from "@api/services/databaseService";
-import capitalizeFirstLetter from "@api/utils/captalizeFirstLetter";
+import capitalizeFirstLetter, {
+  decapitilizeFirstLetter,
+} from "@api/utils/changeCaseFirstLetter";
 import { NextResponse } from "next/server";
 
-export type RouteParams = {
+type RouteParams = {
   params: Promise<{ modelName: string }>;
 };
+
+export function generateStaticParams() {
+  return Object.keys(Models).map((modelName) => ({
+    modelName: decapitilizeFirstLetter(modelName),
+  }));
+}
+
+export const dynamicParams = false;
 
 export async function GET(req: Request, { params }: RouteParams) {
   try {

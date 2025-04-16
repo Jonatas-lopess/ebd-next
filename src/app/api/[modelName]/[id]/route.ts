@@ -1,5 +1,6 @@
 import Models from "@api/models";
 import db from "@api/services/databaseService";
+import capitalizeFirstLetter from "@api/utils/captalizeFirstLetter";
 import { NextResponse } from "next/server";
 
 export type RouteParams = {
@@ -9,7 +10,10 @@ export type RouteParams = {
 export async function GET(req: Request, { params }: RouteParams) {
   try {
     const { modelName, id } = await params;
-    const data = await db.findById({ model: Models[modelName], id });
+    const data = await db.findById({
+      model: Models[capitalizeFirstLetter(modelName)],
+      id,
+    });
 
     return NextResponse.json(data ?? {}, { status: 200 });
   } catch (error) {
@@ -24,7 +28,11 @@ export async function PUT(req: Request, { params }: RouteParams) {
   try {
     const { modelName, id } = await params;
     const body = await req.json();
-    const data = await db.update({ model: Models[modelName], id, data: body });
+    const data = await db.update({
+      model: Models[capitalizeFirstLetter(modelName)],
+      id,
+      data: body,
+    });
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
@@ -38,7 +46,7 @@ export async function PUT(req: Request, { params }: RouteParams) {
 export async function DELETE(req: Request, { params }: RouteParams) {
   try {
     const { modelName, id } = await params;
-    await db.remove({ model: Models[modelName], id });
+    await db.remove({ model: Models[capitalizeFirstLetter(modelName)], id });
 
     return NextResponse.json(
       { message: `${modelName} deleted successfully.` },

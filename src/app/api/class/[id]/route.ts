@@ -1,7 +1,7 @@
 import Class from "@api/models/class";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
-import { RouteParams } from "../types";
+import { RouteParams } from "@api/app/api/types";
 
 export async function GET(request: Request, { params }: RouteParams) {
   try {

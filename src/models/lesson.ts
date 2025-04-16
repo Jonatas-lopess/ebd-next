@@ -5,6 +5,6 @@ const LessonSchema = new Schema({
   date: { type: Date, required: true },
 });
 
-const Lesson = mongoose.model("Lesson", LessonSchema);
+const Lesson = mongoose.models.Lesson || mongoose.model("Lesson", LessonSchema);
 
 export default Lesson;

@@ -5,6 +5,6 @@ const ClassSchema = new Schema({
   group: String,
 });
 
-const Class = mongoose.model("Classe", ClassSchema);
+const Class = mongoose.models.Classe || mongoose.model("Classe", ClassSchema);
 
 export default Class;

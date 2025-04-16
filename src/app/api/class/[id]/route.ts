@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 import { RouteParams } from "../types";
 
-export async function GET({ params }: RouteParams) {
+export async function GET(request: Request, { params }: RouteParams) {
   try {
     await mongoose.connect(process.env.MONGODB_URI as string);
 
@@ -61,7 +61,7 @@ export async function PUT(request: Request, { params }: RouteParams) {
   }
 }
 
-export async function DELETE({ params }: RouteParams) {
+export async function DELETE(request: Request, { params }: RouteParams) {
   try {
     await mongoose.connect(process.env.MONGODB_URI as string);
 

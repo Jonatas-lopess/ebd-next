@@ -11,12 +11,12 @@ interface IModels {
 }
 
 const Models: IModels = {
-  Call,
-  Class,
-  Lesson,
-  Register,
-  User,
-  Score,
+  calls: Call,
+  classes: Class,
+  lessons: Lesson,
+  registers: Register,
+  users: User,
+  scores: Score,
 };
 
 export default Models;

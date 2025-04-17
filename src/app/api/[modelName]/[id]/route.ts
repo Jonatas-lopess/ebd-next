@@ -7,19 +7,6 @@ type RouteParams = {
   params: Promise<{ modelName: string; id: string }>;
 };
 
-type GenerateStaticParamsProps = {
-  params: { modelName: string };
-};
-
-export async function generateStaticParams({
-  params: { modelName },
-}: GenerateStaticParamsProps) {
-  const model = Models[capitalizeFirstLetter(modelName)];
-  const data = await db.findAll(model);
-
-  return data.map((item) => ({ id: item._id.toString() }));
-}
-
 export async function GET(req: Request, { params }: RouteParams) {
   try {
     const { modelName, id } = await params;
@@ -59,10 +46,13 @@ export async function PUT(req: Request, { params }: RouteParams) {
 export async function DELETE(req: Request, { params }: RouteParams) {
   try {
     const { modelName, id } = await params;
-    await db.remove({ model: Models[capitalizeFirstLetter(modelName)], id });
+    const data = await db.remove({
+      model: Models[capitalizeFirstLetter(modelName)],
+      id,
+    });
 
     return NextResponse.json(
-      { message: `${modelName} deleted successfully.` },
+      { message: `${modelName} deleted successfully.`, deletedDocument: data },
       { status: 200 }
     );
   } catch (error) {

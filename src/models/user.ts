@@ -1,6 +1,14 @@
 import mongoose, { Schema } from "mongoose";
 
-const UserSchema = new Schema({
+interface IUser {
+  type: "teacher" | "admin";
+  name: string;
+  idRegister: mongoose.Types.ObjectId;
+  email: string;
+  password: string;
+}
+
+const UserSchema = new Schema<IUser>({
   type: { type: String, enum: ["teacher", "admin"], required: true },
   name: String,
   idRegister: { type: Schema.Types.ObjectId, ref: "Register" },
@@ -8,6 +16,7 @@ const UserSchema = new Schema({
   password: { type: String, required: true },
 });
 
-const User = mongoose.models.User || mongoose.model("User", UserSchema);
+const User: mongoose.Model<IUser> =
+  mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
 
 export default User;

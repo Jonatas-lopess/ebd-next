@@ -1,6 +1,16 @@
 import mongoose, { Schema } from "mongoose";
 
-const CallSchema = new Schema({
+interface ICall {
+  idLesson: mongoose.Types.ObjectId;
+  idRegister: mongoose.Types.ObjectId;
+  isPresent?: boolean;
+  score: {
+    titleScore: string;
+    value: string;
+  }[];
+}
+
+const CallSchema = new Schema<ICall>({
   idLesson: { type: Schema.Types.ObjectId, ref: "Lesson", required: true },
   idRegister: { type: Schema.Types.ObjectId, ref: "Register", required: true },
   isPresent: { type: Boolean, default: false },
@@ -12,6 +22,7 @@ const CallSchema = new Schema({
   ],
 });
 
-const Call = mongoose.models.Call || mongoose.model("Call", CallSchema);
+const Call: mongoose.Model<ICall> =
+  mongoose.models.Call || mongoose.model<ICall>("Call", CallSchema);
 
 export default Call;

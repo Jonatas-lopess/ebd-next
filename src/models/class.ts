@@ -1,10 +1,16 @@
 import mongoose, { Schema } from "mongoose";
 
-const ClassSchema = new Schema({
+interface IClass {
+  name: string;
+  group?: string;
+}
+
+const ClassSchema = new Schema<IClass>({
   name: { type: String, required: true },
   group: String,
 });
 
-const Class = mongoose.models.Classe || mongoose.model("Classe", ClassSchema);
+const Class: mongoose.Model<IClass> =
+  mongoose.models.Classe || mongoose.model<IClass>("Classe", ClassSchema);
 
 export default Class;

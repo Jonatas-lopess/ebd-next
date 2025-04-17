@@ -1,7 +1,7 @@
-export default function capitalizeFirstLetter(string: string) {
-  return string.charAt(0).toUpperCase() + string.slice(1);
+export default function capitalizeFirstLetter(str: string) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function decapitilizeFirstLetter(string: string) {
-  return string.charAt(0).toLowerCase() + string.slice(1);
+export function decapitilizeFirstLetter(str: string) {
+  return str.charAt(0).toLowerCase() + str.slice(1);
 }

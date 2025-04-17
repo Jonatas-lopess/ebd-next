@@ -1,6 +1,5 @@
 import Models from "@api/models";
 import db from "@api/services/databaseService";
-import capitalizeFirstLetter from "@api/utils/changeCaseFirstLetter";
 import { NextResponse } from "next/server";
 
 type RouteParams = {
@@ -11,7 +10,7 @@ export async function GET(req: Request, { params }: RouteParams) {
   try {
     const { modelName, id } = await params;
     const data = await db.findById({
-      model: Models[capitalizeFirstLetter(modelName)],
+      model: Models[modelName],
       id,
     });
 
@@ -29,7 +28,7 @@ export async function PUT(req: Request, { params }: RouteParams) {
     const { modelName, id } = await params;
     const body = await req.json();
     const data = await db.update({
-      model: Models[capitalizeFirstLetter(modelName)],
+      model: Models[modelName],
       id,
       data: body,
     });
@@ -47,7 +46,7 @@ export async function DELETE(req: Request, { params }: RouteParams) {
   try {
     const { modelName, id } = await params;
     const data = await db.remove({
-      model: Models[capitalizeFirstLetter(modelName)],
+      model: Models[modelName],
       id,
     });
 

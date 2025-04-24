@@ -47,6 +47,25 @@ const findById = async ({ model, id }: DatabaseParams) => {
   }
 };
 
+const findOne = async ({ model, data }: DatabaseParams) => {
+  try {
+    await mongoose.connect(process.env.MONGODB_URI as string);
+    mongoose.connection.on("error", (error) => {
+      throw error;
+    });
+
+    const document = await model.findOne(data);
+
+    return document;
+  } catch (error) {
+    throw new Error(`Error fetching in model: ${model.modelName}`, {
+      cause: error,
+    });
+  } finally {
+    await mongoose.disconnect();
+  }
+};
+
 const create = async ({ model, data }: DatabaseParams) => {
   try {
     await mongoose.connect(process.env.MONGODB_URI as string);
@@ -118,6 +137,7 @@ const remove = async ({ model, id }: DatabaseParams) => {
 const db = {
   findAll,
   findById,
+  findOne,
   create,
   update,
   remove,

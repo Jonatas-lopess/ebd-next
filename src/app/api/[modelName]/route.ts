@@ -7,7 +7,9 @@ type RouteParams = {
 };
 
 export function generateStaticParams() {
-  return Object.keys(Models).map((modelName) => ({
+  const { users: _, ...rest } = Models;
+
+  return Object.keys(rest).map((modelName) => ({
     modelName,
   }));
 }

@@ -1,7 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export default function middleware(req: NextRequest) {
+  if (
+    req.nextUrl.pathname === "/api/auth/login" ||
+    req.nextUrl.pathname === "/api/auth/signup"
+  ) {
+    return NextResponse.next();
+  }
+
   const token = req.headers.get("authorization")?.split(" ")[1];
+
   if (!token) {
     return NextResponse.json(
       {

@@ -2,7 +2,7 @@ import Models from "@api/models";
 import db from "@api/services/databaseService";
 import { NextResponse } from "next/server";
 import { compare } from "bcrypt-ts";
-import jwt from "jsonwebtoken";
+import { SignJWT } from "jose";
 import { HydratedDocument } from "mongoose";
 import { IUser } from "@api/models/User";
 
@@ -38,9 +38,10 @@ export async function POST(req: Request) {
       );
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET as string, {
-      expiresIn: "24h",
-    });
+    const token = await new SignJWT({ userId: user._id })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("8h")
+      .sign(new TextEncoder().encode(process.env.JWT_SECRET as string));
 
     return NextResponse.json(
       { message: "Logged in successfully.", token },

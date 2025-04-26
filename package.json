@@ -9,12 +9,11 @@
   },
   "dependencies": {
     "bcrypt-ts": "^6.0.0",
-    "jsonwebtoken": "^9.0.2",
+    "jose": "^6.0.10",
     "mongoose": "^8.13.2",
     "next": "15.3.0"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^9.0.9",
     "@types/node": "^20",
     "@types/react": "^19",
     "typescript": "^5"

@@ -1,5 +1,5 @@
 import Models from "@api/models";
-import db from "@api/services/databaseService";
+import GenericModelManager from "@api/services/databaseService";
 import { NextResponse } from "next/server";
 
 type RouteParams = {
@@ -19,7 +19,10 @@ export const dynamicParams = false;
 export async function GET(req: Request, { params }: RouteParams) {
   try {
     const { modelName } = await params;
-    const data = await db.findAll(Models[modelName]);
+    const body = await req.json();
+    const db = new GenericModelManager(Models[modelName]);
+
+    const data = await db.read({ data: body });
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
@@ -34,10 +37,9 @@ export async function POST(req: Request, { params }: RouteParams) {
   try {
     const { modelName } = await params;
     const body = await req.json();
-    const data = await db.create({
-      model: Models[modelName],
-      data: body,
-    });
+    const db = new GenericModelManager(Models[modelName]);
+
+    const data = await db.create({ data: body });
 
     return NextResponse.json(data, { status: 201 });
   } catch (error) {

@@ -11,6 +11,7 @@ const ClassSchema = new Schema<IClass>({
 });
 
 const Class: mongoose.Model<IClass> =
-  mongoose.models.Classe || mongoose.model<IClass>("Classe", ClassSchema);
+  mongoose.models.Classe ||
+  mongoose.model<IClass>("Class", ClassSchema, "classes");
 
 export default Class;

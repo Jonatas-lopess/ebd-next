@@ -1,15 +1,17 @@
-import mongoose, { Schema } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 
 interface IRegister {
   name: string;
-  idClass: Schema.Types.ObjectId;
+  user?: Types.ObjectId;
+  class: Types.ObjectId;
   aniversary?: string;
   phone?: string;
 }
 
 const RegisterSchema = new Schema<IRegister>({
   name: { type: String, required: true },
-  idClass: { type: Schema.Types.ObjectId, ref: "Class", required: true },
+  user: { type: Schema.Types.ObjectId, ref: "User" },
+  class: { type: Schema.Types.ObjectId, ref: "Class", required: true },
   aniversary: String,
   phone: String,
 });

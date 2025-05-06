@@ -1,5 +1,5 @@
 import Models from "@api/models";
-import db from "@api/services/databaseService";
+import GenericModelManager from "@api/services/databaseService";
 import { NextResponse } from "next/server";
 import { compare } from "bcrypt-ts";
 import { SignJWT } from "jose";
@@ -17,10 +17,9 @@ export async function POST(req: Request) {
       );
     }
 
-    const user: HydratedDocument<IUser> = await db.findOne({
-      model: Models.users,
-      data: { email },
-    });
+    const db = new GenericModelManager(Models.users);
+
+    const user: HydratedDocument<IUser> = await db.read({ data: { email } });
 
     if (!user) {
       return NextResponse.json(
@@ -38,7 +37,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const token = await new SignJWT({ userId: user._id })
+    const token = await new SignJWT({ userId: user.id })
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("8h")
       .sign(new TextEncoder().encode(process.env.JWT_SECRET as string));

@@ -2,7 +2,11 @@ import mongoose, { Schema, Types } from "mongoose";
 
 interface IPlan {
   institution: string;
-  superintendent: Types.ObjectId;
+  superintendent: {
+    id: Types.ObjectId;
+    name: string;
+    email: string;
+  };
   headquarter?: Types.ObjectId;
   price: number;
   isActive: boolean;
@@ -11,14 +15,16 @@ interface IPlan {
   expiresAt?: Date;
 }
 
+const SuperintendentSchema = new Schema({
+  id: { type: Schema.Types.ObjectId, ref: "User" },
+  name: { type: String, required: true },
+  email: { type: String, required: true },
+});
+
 const PlanSchema = new Schema<IPlan>(
   {
     institution: { type: String, required: true },
-    superintendent: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
+    superintendent: SuperintendentSchema,
     headquarter: { type: Schema.Types.ObjectId, ref: "Plan" },
     price: { type: Number, required: true },
     expiresAt: { type: Date, required: true },

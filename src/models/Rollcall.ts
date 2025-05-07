@@ -6,6 +6,7 @@ interface ICall {
   number: number;
   isPresent?: boolean;
   score?: {
+    kind: "BooleanScore" | "NumberScore";
     scoreInfo: Types.ObjectId;
     value: boolean | number;
   }[];

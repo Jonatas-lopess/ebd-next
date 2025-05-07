@@ -3,15 +3,27 @@ import mongoose, { Schema, Types } from "mongoose";
 interface IRegister {
   name: string;
   user?: Types.ObjectId;
-  class: Types.ObjectId;
+  class: {
+    id: Types.ObjectId;
+    name: string;
+    group?: string;
+  };
+  rollcalls?: Types.ObjectId[];
   aniversary?: string;
   phone?: string;
 }
 
+const ClassSchema = new Schema({
+  id: { type: Schema.Types.ObjectId, ref: "Class" },
+  name: { type: String, required: true },
+  group: String,
+});
+
 const RegisterSchema = new Schema<IRegister>({
   name: { type: String, required: true },
   user: { type: Schema.Types.ObjectId, ref: "User" },
-  class: { type: Schema.Types.ObjectId, ref: "Class", required: true },
+  class: ClassSchema,
+  rollcalls: [{ type: Schema.Types.ObjectId, ref: "Rollcall" }],
   aniversary: String,
   phone: String,
 });

@@ -1,3 +1,4 @@
+import GenericModelManager from "@api/services/databaseService";
 import mongoose, { Schema, Types } from "mongoose";
 
 interface IPlan {
@@ -33,7 +34,6 @@ const PlanSchema = new Schema<IPlan>(
   { timestamps: true }
 );
 
-const Plan: mongoose.Model<IPlan> =
-  mongoose.models.Plan || mongoose.model<IPlan>("Plan", PlanSchema);
-
-export default Plan;
+export default new GenericModelManager(
+  mongoose.models.Plan || mongoose.model<IPlan>("Plan", PlanSchema)
+);

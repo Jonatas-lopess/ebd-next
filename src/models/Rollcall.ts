@@ -1,6 +1,10 @@
-import mongoose, { Schema, Types } from "mongoose";
+import GenericModelManager, {
+  DatabaseParams,
+} from "@api/services/databaseService";
+import mongoose, { HydratedDocument, Schema, Types } from "mongoose";
+import Register from "./Register";
 
-interface ICall {
+interface IRollcall {
   register: Types.ObjectId;
   date: Date;
   number: number;
@@ -17,7 +21,7 @@ const scoreSchema = new Schema(
   { discriminatorKey: "kind", _id: false }
 );
 
-const CallSchema = new Schema<ICall>({
+const RollcallSchema = new Schema<IRollcall>({
   register: { type: Schema.Types.ObjectId, ref: "Register", required: true },
   date: { type: Date, required: true },
   number: { type: Number, required: true },
@@ -25,7 +29,7 @@ const CallSchema = new Schema<ICall>({
   score: [scoreSchema],
 });
 
-const docArray = CallSchema.path<Schema.Types.DocumentArray>("score");
+const docArray = RollcallSchema.path<Schema.Types.DocumentArray>("score");
 
 docArray.discriminator(
   "BooleanScore",
@@ -37,6 +41,36 @@ docArray.discriminator(
   new Schema({ value: { type: Number, required: true } }, { _id: false })
 );
 
-const Call = mongoose.model<ICall>("Call", CallSchema);
+export default class Rollcall extends GenericModelManager {
+  constructor() {
+    super(
+      mongoose.models.Rollcall ||
+        mongoose.model<IRollcall>("Rollcall", RollcallSchema)
+    );
+  }
 
-export default Call;
+  async create({ data }: DatabaseParams): Promise<any> {
+    try {
+      await mongoose.connect(process.env.MONGODB_URI as string);
+      mongoose.connection.on("error", (err) => {
+        throw err;
+      });
+
+      const rollcall: HydratedDocument<IRollcall> = await this.model.create(
+        data
+      );
+      const register = new Register();
+
+      await register.update({
+        id: rollcall.register,
+        data: {
+          $push: { rollcalls: rollcall._id },
+        },
+      });
+
+      return rollcall;
+    } finally {
+      await mongoose.connection.close();
+    }
+  }
+}

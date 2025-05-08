@@ -1,3 +1,4 @@
+import GenericModelManager from "@api/services/databaseService";
 import mongoose, { Schema, Types } from "mongoose";
 
 interface IScore {
@@ -14,7 +15,6 @@ const ScoreSchema = new Schema<IScore>({
   weight: { type: Number, required: true },
 });
 
-const Score: mongoose.Model<IScore> =
-  mongoose.models.Score || mongoose.model<IScore>("Score", ScoreSchema);
-
-export default Score;
+export default new GenericModelManager(
+  mongoose.models.Score || mongoose.model<IScore>("Score", ScoreSchema)
+);

@@ -15,6 +15,8 @@ const ClassSchema = new Schema<IClass>({
   students: [{ type: Schema.Types.ObjectId, ref: "Register" }],
 });
 
-export default new GenericModelManager(
-  mongoose.models.Class || mongoose.model<IClass>("Class", ClassSchema)
-);
+export default class Class extends GenericModelManager<IClass> {
+  constructor() {
+    super(mongoose.model("Class", ClassSchema));
+  }
+}

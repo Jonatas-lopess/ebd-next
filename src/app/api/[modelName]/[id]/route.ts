@@ -1,5 +1,4 @@
 import Models from "@api/models";
-import GenericModelManager from "@api/services/databaseService";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
 
@@ -10,7 +9,7 @@ type RouteParams = {
 export async function GET(req: Request, { params }: RouteParams) {
   try {
     const { modelName, id } = await params;
-    const db = new GenericModelManager(Models[modelName]);
+    const db = Models[modelName];
 
     if (!mongoose.isValidObjectId(id))
       return NextResponse.json(
@@ -33,7 +32,7 @@ export async function PUT(req: Request, { params }: RouteParams) {
   try {
     const { modelName, id } = await params;
     const body = await req.json();
-    const db = new GenericModelManager(Models[modelName]);
+    const db = Models[modelName];
 
     const data = await db.update({
       id,
@@ -52,9 +51,9 @@ export async function PUT(req: Request, { params }: RouteParams) {
 export async function DELETE(req: Request, { params }: RouteParams) {
   try {
     const { modelName, id } = await params;
-    const db = new GenericModelManager(Models[modelName]);
+    const db = Models[modelName];
 
-    const data = await db.delete({ id });
+    const data = await db.delete(id);
 
     return NextResponse.json(
       { message: `${modelName} deleted successfully.`, deletedDocument: data },

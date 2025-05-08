@@ -15,6 +15,8 @@ const ScoreSchema = new Schema<IScore>({
   weight: { type: Number, required: true },
 });
 
-export default new GenericModelManager(
-  mongoose.models.Score || mongoose.model<IScore>("Score", ScoreSchema)
-);
+export default class Score extends GenericModelManager<IScore> {
+  constructor() {
+    super(mongoose.model("Score", ScoreSchema));
+  }
+}

@@ -30,7 +30,7 @@ const RegisterSchema = new Schema<IRegister>({
   phone: String,
 });
 
-export default class Register extends GenericModelManager {
+export default class Register extends GenericModelManager<IRegister> {
   constructor() {
     super(
       mongoose.models.Register ||
@@ -38,7 +38,7 @@ export default class Register extends GenericModelManager {
     );
   }
 
-  async create({ data }: { data: IRegister }): Promise<any> {
+  override async create(data: IRegister) {
     try {
       await mongoose.connect(process.env.MONGODB_URI as string);
       mongoose.connection.on("error", (error) => {
@@ -53,7 +53,7 @@ export default class Register extends GenericModelManager {
           group: data.class.group,
         },
       });
-      const _class = new GenericModelManager(Class);
+      const _class = new Class();
 
       if (data.user === undefined) {
         await _class.update({

@@ -1,5 +1,4 @@
 import Models from "@api/models";
-import GenericModelManager from "@api/services/databaseService";
 import { NextResponse } from "next/server";
 
 type RouteParams = {
@@ -7,9 +6,7 @@ type RouteParams = {
 };
 
 export function generateStaticParams() {
-  const { users: _, ...rest } = Models;
-
-  return Object.keys(rest).map((modelName) => ({
+  return Object.keys(Models).map((modelName) => ({
     modelName,
   }));
 }
@@ -20,7 +17,7 @@ export async function GET(req: Request, { params }: RouteParams) {
   try {
     const { modelName } = await params;
     const body = await req.json();
-    const db = new GenericModelManager(Models[modelName]);
+    const db = Models[modelName];
 
     const data = await db.read({ data: body });
 
@@ -37,7 +34,7 @@ export async function POST(req: Request, { params }: RouteParams) {
   try {
     const { modelName } = await params;
     const body = await req.json();
-    const db = new GenericModelManager(Models[modelName]);
+    const db = Models[modelName];
 
     const data = await db.create({ data: body });
 

@@ -41,7 +41,7 @@ docArray.discriminator(
   new Schema({ value: { type: Number, required: true } }, { _id: false })
 );
 
-export default class Rollcall extends GenericModelManager {
+export default class Rollcall extends GenericModelManager<IRollcall> {
   constructor() {
     super(
       mongoose.models.Rollcall ||
@@ -49,7 +49,7 @@ export default class Rollcall extends GenericModelManager {
     );
   }
 
-  async create({ data }: DatabaseParams): Promise<any> {
+  override async create(data: IRollcall) {
     try {
       await mongoose.connect(process.env.MONGODB_URI as string);
       mongoose.connection.on("error", (err) => {

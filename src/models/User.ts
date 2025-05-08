@@ -1,6 +1,8 @@
 import mongoose, { Schema, Types } from "mongoose";
 import { hashSync } from "bcrypt-ts";
-import GenericModelManager from "@api/services/databaseService";
+import GenericModelManager, {
+  DatabaseParams,
+} from "@api/services/databaseService";
 import Register from "./Register";
 
 export interface IUser {
@@ -43,12 +45,12 @@ UserSchema.pre("save", function (next) {
   next();
 });
 
-export default class User extends GenericModelManager {
+export default class User extends GenericModelManager<IUser> {
   constructor() {
     super(mongoose.models.User || mongoose.model<IUser>("User", UserSchema));
   }
 
-  async create({ data }: { data: IUser }) {
+  override async create(data: IUser) {
     try {
       await mongoose.connect(process.env.MONGODB_URI as string);
       mongoose.connection.on("error", (err) => {

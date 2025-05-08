@@ -34,6 +34,8 @@ const PlanSchema = new Schema<IPlan>(
   { timestamps: true }
 );
 
-export default new GenericModelManager(
-  mongoose.models.Plan || mongoose.model<IPlan>("Plan", PlanSchema)
-);
+export default class Plan extends GenericModelManager<IPlan> {
+  constructor() {
+    super(mongoose.model("Plan", PlanSchema));
+  }
+}

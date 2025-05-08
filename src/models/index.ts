@@ -1,22 +1,20 @@
-import { Model } from "mongoose";
-import RollCall from "./Rollcall";
+import Rollcall from "./Rollcall";
 import Class from "./Class";
 import Register from "./Register";
 import Score from "./Score";
-import User from "./User";
 import Plan from "./Plan";
+import { IDatabaseService } from "@api/services/databaseService";
 
 interface IModels {
-  [key: string]: Model<any>;
+  [key: string]: IDatabaseService;
 }
 
 const Models: IModels = {
-  rollcalls: RollCall,
-  plans: Plan,
-  classes: Class,
-  registers: Register,
-  users: User,
-  scores: Score,
+  rollcalls: new Rollcall(),
+  plans: new Plan(),
+  classes: new Class(),
+  registers: new Register(),
+  scores: new Score(),
 };
 
 export default Models;

@@ -1,5 +1,4 @@
 import Models from "@api/models";
-import GenericModelManager from "@api/services/databaseService";
 import { NextResponse } from "next/server";
 import { compare } from "bcrypt-ts";
 import { SignJWT } from "jose";
@@ -17,7 +16,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const db = new GenericModelManager(Models.users);
+    const db = Models.users;
 
     const user: HydratedDocument<IUser> = await db.read({ data: { email } });
 

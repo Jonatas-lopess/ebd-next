@@ -1,11 +1,11 @@
 import mongoose from "mongoose";
 
-type DatabaseParams = {
+export type DatabaseParams = {
   id?: mongoose.Types.ObjectId | string;
   data?: mongoose.RootFilterQuery<any>;
 };
 
-interface IDatabaseService {
+export interface IDatabaseService {
   readonly model: mongoose.Model<any>;
   create: (params: DatabaseParams) => Promise<any>;
   read: (params: DatabaseParams) => Promise<any>;

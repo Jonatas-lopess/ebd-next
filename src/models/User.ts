@@ -1,5 +1,7 @@
 import mongoose, { Schema, Types } from "mongoose";
 import { hashSync } from "bcrypt-ts";
+import GenericModelManager from "@api/services/databaseService";
+import Register from "./Register";
 
 export interface IUser {
   role: "teacher" | "admin";
@@ -41,7 +43,33 @@ UserSchema.pre("save", function (next) {
   next();
 });
 
-const User: mongoose.Model<IUser> =
-  mongoose.models.User || mongoose.model<IUser>("User", UserSchema);
+export default class User extends GenericModelManager {
+  constructor() {
+    super(mongoose.models.User || mongoose.model<IUser>("User", UserSchema));
+  }
 
-export default User;
+  async create({ data }: { data: IUser }) {
+    try {
+      await mongoose.connect(process.env.MONGODB_URI as string);
+      mongoose.connection.on("error", (err) => {
+        throw err;
+      });
+
+      const user = await this.model.create(data);
+      const register = new Register();
+
+      if (data.register) {
+        await register.update({
+          id: data.register.id,
+          data: {
+            user: user._id,
+          },
+        });
+      }
+
+      return user;
+    } finally {
+      await mongoose.connection.close();
+    }
+  }
+}

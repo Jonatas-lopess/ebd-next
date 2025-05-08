@@ -1,4 +1,6 @@
+import GenericModelManager from "@api/services/databaseService";
 import mongoose, { Schema, Types } from "mongoose";
+import Class from "./Class";
 
 interface IRegister {
   name: string;
@@ -28,8 +30,43 @@ const RegisterSchema = new Schema<IRegister>({
   phone: String,
 });
 
-const Register: mongoose.Model<IRegister> =
-  mongoose.models.Register ||
-  mongoose.model<IRegister>("Register", RegisterSchema);
+export default class Register extends GenericModelManager {
+  constructor() {
+    super(
+      mongoose.models.Register ||
+        mongoose.model<IRegister>("Register", RegisterSchema)
+    );
+  }
 
-export default Register;
+  async create({ data }: { data: IRegister }): Promise<any> {
+    try {
+      await mongoose.connect(process.env.MONGODB_URI as string);
+      mongoose.connection.on("error", (error) => {
+        throw error;
+      });
+
+      const register = await this.model.create({
+        ...data,
+        class: {
+          id: data.class.id,
+          name: data.class.name,
+          group: data.class.group,
+        },
+      });
+      const _class = new GenericModelManager(Class);
+
+      if (data.user === undefined) {
+        await _class.update({
+          id: data.class.id,
+          data: {
+            $push: { students: register._id },
+          },
+        });
+      }
+
+      return register;
+    } finally {
+      await mongoose.disconnect();
+    }
+  }
+}

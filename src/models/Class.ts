@@ -1,3 +1,4 @@
+import GenericModelManager from "@api/services/databaseService";
 import mongoose, { Schema, Types } from "mongoose";
 
 interface IClass {
@@ -14,8 +15,6 @@ const ClassSchema = new Schema<IClass>({
   students: [{ type: Schema.Types.ObjectId, ref: "Register" }],
 });
 
-const Class: mongoose.Model<IClass> =
-  mongoose.models.Classe ||
-  mongoose.model<IClass>("Class", ClassSchema, "classes");
-
-export default Class;
+export default new GenericModelManager(
+  mongoose.models.Class || mongoose.model<IClass>("Class", ClassSchema)
+);

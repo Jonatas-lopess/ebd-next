@@ -10,22 +10,27 @@ interface IRegister {
     name: string;
     group?: string;
   };
-  rollcalls?: Types.ObjectId[];
+  rollcalls?: { id: Types.ObjectId; isPresent: boolean }[];
   aniversary?: string;
   phone?: string;
 }
 
-const ClassSchema = new Schema({
+const classSchema = new Schema({
   id: { type: Schema.Types.ObjectId, ref: "Class" },
   name: { type: String, required: true },
   group: String,
 });
 
+const rollcallSchema = new Schema({
+  id: { type: Schema.Types.ObjectId, ref: "Rollcall" },
+  isPresent: { type: Boolean, required: true },
+});
+
 const RegisterSchema = new Schema<IRegister>({
   name: { type: String, required: true },
   user: { type: Schema.Types.ObjectId, ref: "User" },
-  class: ClassSchema,
-  rollcalls: [{ type: Schema.Types.ObjectId, ref: "Rollcall" }],
+  class: classSchema,
+  rollcalls: [rollcallSchema],
   aniversary: String,
   phone: String,
 });

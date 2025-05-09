@@ -8,7 +8,7 @@ export type DatabaseParams<D = any> = {
 export interface IDatabaseService {
   readonly model: Model<any>;
   create: (data: any) => Promise<HydratedDocument<any>>;
-  read: (params: DatabaseParams) => Promise<any>;
+  read: (params?: DatabaseParams) => Promise<any>;
   update: (params: DatabaseParams) => Promise<any>;
   delete: (id: Types.ObjectId | string) => Promise<HydratedDocument<any>>;
 }
@@ -37,19 +37,18 @@ export default class GenericModelManager<T> implements IDatabaseService {
     }
   }
 
-  async read({
-    id,
-    data = {},
-  }: DatabaseParams<mongoose.RootFilterQuery<T>>): Promise<any> {
+  async read(
+    params?: DatabaseParams<mongoose.RootFilterQuery<T>>
+  ): Promise<any> {
     try {
       await mongoose.connect(process.env.MONGODB_URI as string);
       mongoose.connection.on("error", (error) => {
         throw error;
       });
 
-      if (id) return await this.model.findById(id);
+      if (params?.id) return await this.model.findById(params?.id);
 
-      return await this.model.find(data);
+      return await this.model.find(params?.data ?? {});
     } catch (error) {
       throw new Error(`Error fetching in model: ${this.model.modelName}`, {
         cause: error,

@@ -1,14 +1,13 @@
-import Models from "@api/models";
-import { IUser } from "@api/models/User";
+import User, { IUser } from "@api/models/User";
 import { HydratedDocument } from "mongoose";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const db = Models.users;
+    const db = new User();
 
-    const user: HydratedDocument<IUser> = await db.create({ data: body });
+    const user: HydratedDocument<IUser> = await db.create(body);
 
     return NextResponse.json(
       { message: "Sign up successfully.", userId: user.id },

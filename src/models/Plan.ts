@@ -31,7 +31,7 @@ const PlanSchema = new Schema<IPlan>(
     expiresAt: { type: Date, required: true },
     isActive: { type: Boolean, default: true },
   },
-  { timestamps: true }
+  { timestamps: true, strict: "throw" }
 );
 
 export default class Plan extends GenericModelManager<IPlan> {

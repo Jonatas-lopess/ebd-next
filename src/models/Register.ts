@@ -26,14 +26,17 @@ const rollcallSchema = new Schema({
   isPresent: { type: Boolean, required: true },
 });
 
-const RegisterSchema = new Schema<IRegister>({
-  name: { type: String, required: true },
-  user: { type: Schema.Types.ObjectId, ref: "User" },
-  class: classSchema,
-  rollcalls: [rollcallSchema],
-  aniversary: String,
-  phone: String,
-});
+const RegisterSchema = new Schema<IRegister>(
+  {
+    name: { type: String, required: true },
+    user: { type: Schema.Types.ObjectId, ref: "User" },
+    class: classSchema,
+    rollcalls: [rollcallSchema],
+    aniversary: String,
+    phone: String,
+  },
+  { strict: "throw" }
+);
 
 export default class Register extends GenericModelManager<IRegister> {
   constructor() {

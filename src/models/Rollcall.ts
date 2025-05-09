@@ -21,13 +21,16 @@ const scoreSchema = new Schema(
   { discriminatorKey: "kind", _id: false }
 );
 
-const RollcallSchema = new Schema<IRollcall>({
-  register: { type: Schema.Types.ObjectId, ref: "Register", required: true },
-  date: { type: Date, required: true },
-  number: { type: Number, required: true },
-  isPresent: { type: Boolean, default: false },
-  score: [scoreSchema],
-});
+const RollcallSchema = new Schema<IRollcall>(
+  {
+    register: { type: Schema.Types.ObjectId, ref: "Register", required: true },
+    date: { type: Date, required: true },
+    number: { type: Number, required: true },
+    isPresent: { type: Boolean, default: false },
+    score: [scoreSchema],
+  },
+  { strict: "throw" }
+);
 
 const docArray = RollcallSchema.path<Schema.Types.DocumentArray>("score");
 

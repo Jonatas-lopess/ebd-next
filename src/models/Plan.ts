@@ -36,6 +36,6 @@ const PlanSchema = new Schema<IPlan>(
 
 export default class Plan extends GenericModelManager<IPlan> {
   constructor() {
-    super(mongoose.model("Plan", PlanSchema));
+    super(mongoose.models.Plan || mongoose.model("Plan", PlanSchema));
   }
 }

@@ -17,6 +17,6 @@ const ScoreSchema = new Schema<IScore>({
 
 export default class Score extends GenericModelManager<IScore> {
   constructor() {
-    super(mongoose.model("Score", ScoreSchema));
+    super(mongoose.models.Score || mongoose.model("Score", ScoreSchema));
   }
 }

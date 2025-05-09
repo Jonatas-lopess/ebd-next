@@ -64,7 +64,9 @@ export default class Rollcall extends GenericModelManager<IRollcall> {
       await register.update({
         id: rollcall.register,
         data: {
-          $push: { rollcalls: rollcall._id },
+          $push: {
+            rollcalls: { id: rollcall._id, isPresent: rollcall.isPresent },
+          },
         },
       });
 

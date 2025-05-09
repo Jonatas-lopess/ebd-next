@@ -17,6 +17,6 @@ const ClassSchema = new Schema<IClass>({
 
 export default class Class extends GenericModelManager<IClass> {
   constructor() {
-    super(mongoose.model("Class", ClassSchema));
+    super(mongoose.models.Classe || mongoose.model("Classe", ClassSchema));
   }
 }

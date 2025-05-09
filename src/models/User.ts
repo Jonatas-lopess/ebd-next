@@ -1,4 +1,4 @@
-import mongoose, { Schema, Types } from "mongoose";
+import mongoose, { HydratedDocument, Schema, Types } from "mongoose";
 import { hashSync } from "bcrypt-ts";
 import GenericModelManager, {
   DatabaseParams,
@@ -73,6 +73,19 @@ export default class User extends GenericModelManager<IUser> {
       }
 
       return user;
+    } finally {
+      await mongoose.connection.close();
+    }
+  }
+
+  async getByEmail(email: string): Promise<HydratedDocument<IUser> | null> {
+    try {
+      await mongoose.connect(process.env.MONGODB_URI as string);
+      mongoose.connection.on("error", (err) => {
+        throw err;
+      });
+
+      return await this.model.findOne({ email }).select("+password");
     } finally {
       await mongoose.connection.close();
     }

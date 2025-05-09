@@ -17,7 +17,7 @@ export async function POST(req: Request) {
 
     const db = new User();
 
-    const user: HydratedDocument<IUser> = await db.read({ data: { email } });
+    const user = await db.getByEmail(email);
 
     if (!user) {
       return NextResponse.json(

@@ -20,13 +20,16 @@ export interface IUser {
   password: string;
 }
 
-const RegisterSchema = new Schema({
-  id: { type: Schema.Types.ObjectId, ref: "Register" },
-  name: { type: String, required: true },
-  class: { type: Schema.Types.ObjectId, ref: "Class" },
-  aniversary: String,
-  phone: String,
-});
+const RegisterSchema = new Schema(
+  {
+    id: { type: Schema.Types.ObjectId, ref: "Register" },
+    name: { type: String, required: true },
+    class: { type: Schema.Types.ObjectId, ref: "Class" },
+    aniversary: String,
+    phone: String,
+  },
+  { strict: "throw" }
+);
 
 const UserSchema = new Schema<IUser>({
   role: { type: String, enum: ["teacher", "admin"], required: true },

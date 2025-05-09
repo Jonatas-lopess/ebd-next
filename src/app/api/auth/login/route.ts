@@ -1,9 +1,8 @@
-import Models from "@api/models";
 import { NextResponse } from "next/server";
 import { compare } from "bcrypt-ts";
 import { SignJWT } from "jose";
 import { HydratedDocument } from "mongoose";
-import { IUser } from "@api/models/User";
+import User, { IUser } from "@api/models/User";
 
 export async function POST(req: Request) {
   try {
@@ -16,7 +15,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const db = Models.users;
+    const db = new User();
 
     const user: HydratedDocument<IUser> = await db.read({ data: { email } });
 

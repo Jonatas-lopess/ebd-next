@@ -16,10 +16,9 @@ export const dynamicParams = false;
 export async function GET(req: Request, { params }: RouteParams) {
   try {
     const { modelName } = await params;
-    const body = await req.json();
     const db = Models[modelName];
 
-    const data = await db.read({ data: body });
+    const data = await db.read();
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {

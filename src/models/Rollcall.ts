@@ -53,6 +53,9 @@ export default class Rollcall extends GenericModelManager<IRollcall> {
   }
 
   override async create(data: IRollcall) {
+    if (Types.ObjectId.isValid(data.register) === false)
+      throw new Error("Invalid register ID.");
+
     try {
       await mongoose.connect(process.env.MONGODB_URI as string);
       mongoose.connection.on("error", (err) => {

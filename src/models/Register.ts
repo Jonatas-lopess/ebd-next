@@ -15,16 +15,22 @@ interface IRegister {
   phone?: string;
 }
 
-const classSchema = new Schema({
-  id: { type: Schema.Types.ObjectId, ref: "Class" },
-  name: { type: String, required: true },
-  group: String,
-});
+const classSchema = new Schema(
+  {
+    id: { type: Schema.Types.ObjectId, ref: "Class" },
+    name: { type: String, required: true },
+    group: String,
+  },
+  { _id: false, strict: "throw" }
+);
 
-const rollcallSchema = new Schema({
-  id: { type: Schema.Types.ObjectId, ref: "Rollcall" },
-  isPresent: { type: Boolean, required: true },
-});
+const rollcallSchema = new Schema(
+  {
+    id: { type: Schema.Types.ObjectId, ref: "Rollcall" },
+    isPresent: { type: Boolean, required: true },
+  },
+  { _id: false, strict: "throw" }
+);
 
 const RegisterSchema = new Schema<IRegister>(
   {
@@ -47,6 +53,9 @@ export default class Register extends GenericModelManager<IRegister> {
   }
 
   override async create(data: IRegister) {
+    if (Types.ObjectId.isValid(data.class.id) === false)
+      throw new Error("Invalid class ID.");
+
     try {
       await mongoose.connect(process.env.MONGODB_URI as string);
       mongoose.connection.on("error", (error) => {

@@ -1,8 +1,6 @@
 import mongoose, { HydratedDocument, Schema, Types } from "mongoose";
 import { hashSync } from "bcrypt-ts";
-import GenericModelManager, {
-  DatabaseParams,
-} from "@api/services/databaseService";
+import GenericModelManager from "@api/services/databaseService";
 import Register from "./Register";
 
 export interface IUser {
@@ -20,7 +18,7 @@ export interface IUser {
   password: string;
 }
 
-const RegisterSchema = new Schema(
+const registerSchema = new Schema(
   {
     id: { type: Schema.Types.ObjectId, ref: "Register" },
     name: { type: String, required: true },
@@ -28,14 +26,14 @@ const RegisterSchema = new Schema(
     aniversary: String,
     phone: String,
   },
-  { strict: "throw" }
+  { strict: "throw", _id: false }
 );
 
 const UserSchema = new Schema<IUser>({
   role: { type: String, enum: ["teacher", "admin"], required: true },
   name: String,
   plan: { type: Schema.Types.ObjectId, ref: "Plan", required: true },
-  register: RegisterSchema,
+  register: registerSchema,
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true, select: false },
 });

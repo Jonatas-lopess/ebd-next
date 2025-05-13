@@ -22,7 +22,14 @@ export async function GET(req: Request, { params }: RouteParams) {
     return NextResponse.json(data ?? {}, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { message: "An error occurred while processing your request.", error },
+      {
+        message: "An error occurred while processing your request.",
+        error: {
+          message: (error as Error).message,
+          type: (error as Error).name,
+          details: error,
+        },
+      },
       { status: 500 }
     );
   }
@@ -42,7 +49,14 @@ export async function PUT(req: Request, { params }: RouteParams) {
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { message: "An error occurred while processing your request.", error },
+      {
+        message: "An error occurred while processing your request.",
+        error: {
+          message: (error as Error).message,
+          type: (error as Error).name,
+          details: error,
+        },
+      },
       { status: 500 }
     );
   }
@@ -61,7 +75,14 @@ export async function DELETE(req: Request, { params }: RouteParams) {
     );
   } catch (error) {
     return NextResponse.json(
-      { message: "An error occurred while processing your request.", error },
+      {
+        message: "An error occurred while processing your request.",
+        error: {
+          message: (error as Error).message,
+          type: (error as Error).name,
+          details: error,
+        },
+      },
       { status: 500 }
     );
   }

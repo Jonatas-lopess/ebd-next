@@ -23,7 +23,14 @@ export async function GET(req: Request, { params }: RouteParams) {
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
     return NextResponse.json(
-      { message: "An error occurred while processing your request.", error },
+      {
+        message: "An error occurred while processing your request.",
+        error: {
+          message: (error as Error).message,
+          type: (error as Error).name,
+          details: error,
+        },
+      },
       { status: 500 }
     );
   }
@@ -35,7 +42,7 @@ export async function POST(req: Request, { params }: RouteParams) {
     const body = await req.json();
     const db = Models[modelName];
 
-    const data = await db.create({ data: body });
+    const data = await db.create(body);
 
     return NextResponse.json(data, { status: 201 });
   } catch (err) {

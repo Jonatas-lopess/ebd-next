@@ -5,7 +5,7 @@ interface IClass {
   name: string;
   group?: string;
   flag: Types.ObjectId;
-  students: Types.ObjectId[];
+  students?: Types.ObjectId[];
 }
 
 const ClassSchema = new Schema<IClass>(

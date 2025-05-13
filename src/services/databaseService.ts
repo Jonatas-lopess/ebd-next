@@ -63,12 +63,15 @@ export default class GenericModelManager<T> implements IDatabaseService {
         throw error;
       });
 
-      const document = await this.model.findById(id);
+      const document = await this.model.findByIdAndUpdate(id, data, {
+        new: true,
+        runValidators: true,
+      });
+
       if (document === null)
         throw new Error(`${this.model.modelName} not found.`);
 
-      document.set(data);
-      return await document.save();
+      return document;
     } finally {
       await mongoose.disconnect();
     }

@@ -35,13 +35,19 @@ export async function POST(req: Request, { params }: RouteParams) {
     const body = await req.json();
     const db = Models[modelName];
 
-    console.log("Request body:", body);
     const data = await db.create({ data: body });
 
     return NextResponse.json(data, { status: 201 });
-  } catch (error) {
+  } catch (err) {
     return NextResponse.json(
-      { message: "An error occurred while processing your request.", error },
+      {
+        message: "An error occurred while processing your request.",
+        error: {
+          message: (err as Error).message,
+          type: (err as Error).name,
+          details: err,
+        },
+      },
       { status: 500 }
     );
   }

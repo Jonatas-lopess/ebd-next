@@ -35,6 +35,7 @@ export async function POST(req: Request, { params }: RouteParams) {
     const body = await req.json();
     const db = Models[modelName];
 
+    console.log("Request body:", body);
     const data = await db.create({ data: body });
 
     return NextResponse.json(data, { status: 201 });

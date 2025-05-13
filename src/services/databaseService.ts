@@ -28,10 +28,6 @@ export default class GenericModelManager<T> implements IDatabaseService {
       });
 
       return await this.model.create(data);
-    } catch (error) {
-      throw new Error(`Error creating in model: ${this.model.modelName}`, {
-        cause: error,
-      });
     } finally {
       await mongoose.disconnect();
     }
@@ -49,10 +45,6 @@ export default class GenericModelManager<T> implements IDatabaseService {
       if (params?.id) return await this.model.findById(params?.id);
 
       return await this.model.find(params?.data ?? {});
-    } catch (error) {
-      throw new Error(`Error fetching in model: ${this.model.modelName}`, {
-        cause: error,
-      });
     } finally {
       await mongoose.disconnect();
     }
@@ -77,10 +69,6 @@ export default class GenericModelManager<T> implements IDatabaseService {
 
       document.set(data);
       return await document.save();
-    } catch (error) {
-      throw new Error(`Error updating in model: ${this.model.modelName}`, {
-        cause: error,
-      });
     } finally {
       await mongoose.disconnect();
     }
@@ -103,10 +91,6 @@ export default class GenericModelManager<T> implements IDatabaseService {
         throw new Error(`${this.model.modelName} not found.`);
 
       return document;
-    } catch (error) {
-      throw new Error(`Error deleting in model: ${this.model.modelName}`, {
-        cause: error,
-      });
     } finally {
       await mongoose.disconnect();
     }

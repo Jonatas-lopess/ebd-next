@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { compare } from "bcrypt-ts";
 import { SignJWT } from "jose";
-import { HydratedDocument } from "mongoose";
-import User, { IUser } from "@api/models/User";
+import User from "@api/models/User";
 
 export async function POST(req: Request) {
   try {

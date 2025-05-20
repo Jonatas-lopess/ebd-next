@@ -3,7 +3,8 @@ import { NextResponse } from "next/server";
 
 export async function GET(req: Request) {
   try {
-    const userId = req.headers.get("userId");
+    const userId = req.headers.get("userid");
+    console.log(req.headers, userId);
     const db = new User();
 
     if (!userId) {

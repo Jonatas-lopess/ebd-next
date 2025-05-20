@@ -27,7 +27,17 @@ export default async function middleware(req: NextRequest) {
       new TextEncoder().encode(process.env.JWT_SECRET as string)
     );
 
-    req.headers.set("userId", payload.userId as string);
+    const headers = new Headers(req.headers);
+    headers.set("userid", payload.userId as string);
+
+    const modifiedReq = new Request(req.url, {
+      headers,
+      body: req.body,
+      method: req.method,
+      redirect: req.redirect,
+    });
+
+    return NextResponse.next({ request: modifiedReq });
   } catch (error) {
     return NextResponse.json(
       {

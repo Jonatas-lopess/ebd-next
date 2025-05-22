@@ -10,7 +10,6 @@ interface IModels {
 }
 
 const Models: IModels = {
-  rollcalls: new Rollcall(),
   plans: new Plan(),
   classes: new Class(),
   registers: new Register(),

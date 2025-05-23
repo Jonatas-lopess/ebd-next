@@ -22,6 +22,7 @@ export async function GET(req: Request, { params }: RouteParams) {
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
+    console.error(error);
     return NextResponse.json(
       {
         message: "An error occurred while processing your request.",
@@ -46,6 +47,7 @@ export async function POST(req: Request, { params }: RouteParams) {
 
     return NextResponse.json(data, { status: 201 });
   } catch (err) {
+    console.error(err);
     return NextResponse.json(
       {
         message: "An error occurred while processing your request.",

@@ -21,6 +21,7 @@ export async function GET(req: Request, { params }: RouteParams) {
 
     return NextResponse.json(data ?? {}, { status: 200 });
   } catch (error) {
+    console.error(error);
     return NextResponse.json(
       {
         message: "An error occurred while processing your request.",
@@ -48,6 +49,7 @@ export async function PUT(req: Request, { params }: RouteParams) {
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
+    console.error(error);
     return NextResponse.json(
       {
         message: "An error occurred while processing your request.",
@@ -74,6 +76,7 @@ export async function DELETE(req: Request, { params }: RouteParams) {
       { status: 200 }
     );
   } catch (error) {
+    console.error(error);
     return NextResponse.json(
       {
         message: "An error occurred while processing your request.",

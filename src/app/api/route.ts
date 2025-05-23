@@ -10,6 +10,7 @@ export async function GET() {
 
     return NextResponse.json({ message: "MongoDB connected successfully" });
   } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { message: "MongoDB connection failed", error },
       { status: 500 }

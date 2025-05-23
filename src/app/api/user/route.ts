@@ -4,7 +4,6 @@ import { NextResponse } from "next/server";
 export async function GET(req: Request) {
   try {
     const userId = req.headers.get("userid");
-    console.log(req.headers, userId);
     const db = new User();
 
     if (!userId) {
@@ -25,6 +24,7 @@ export async function GET(req: Request) {
       { status: 200 }
     );
   } catch (error) {
+    console.error(error);
     return NextResponse.json(
       { message: "An error occurred while processing your request.", error },
       { status: 500 }

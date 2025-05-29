@@ -24,4 +24,17 @@ export default class Class extends GenericModelManager<IClass> {
   constructor() {
     super(mongoose.models.Classe || mongoose.model("Classe", ClassSchema));
   }
+
+  async getIdentifiers() {
+    try {
+      await mongoose.connect(process.env.MONGODB_URI as string);
+      mongoose.connection.on("error", (err) => {
+        throw err;
+      });
+
+      return await this.model.distinct<"_id", Types.ObjectId>("_id");
+    } finally {
+      mongoose.connection.close();
+    }
+  }
 }

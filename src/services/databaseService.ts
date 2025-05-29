@@ -34,7 +34,8 @@ export default class GenericModelManager<T> implements IDatabaseService {
   }
 
   async read(
-    params?: DatabaseParams<mongoose.RootFilterQuery<T>>
+    params?: DatabaseParams<mongoose.RootFilterQuery<T>>,
+    select?: string
   ): Promise<any> {
     try {
       await mongoose.connect(process.env.MONGODB_URI as string);
@@ -44,7 +45,7 @@ export default class GenericModelManager<T> implements IDatabaseService {
 
       if (params?.id) return await this.model.findById(params?.id);
 
-      return await this.model.find(params?.data ?? {});
+      return await this.model.find(params?.data ?? {}, select);
     } finally {
       await mongoose.disconnect();
     }

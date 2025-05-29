@@ -29,6 +29,12 @@ export async function POST(req: Request) {
     const rollcall = new Rollcall();
     const body = await req.json();
 
+    if (Array.isArray(body)) {
+      const data = await rollcall.createMany(body);
+
+      return NextResponse.json(data, { status: 201 });
+    }
+
     const data = await rollcall.create(body);
 
     return NextResponse.json(data, { status: 201 });

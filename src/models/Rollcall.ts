@@ -1,19 +1,23 @@
-import GenericModelManager, {
-  DatabaseParams,
-} from "@api/services/databaseService";
+import GenericModelManager from "@api/services/databaseService";
 import mongoose, { HydratedDocument, Schema, Types } from "mongoose";
 import Register from "./Register";
 
 interface IRollcall {
   register: Types.ObjectId;
-  date: Date;
-  number: number;
+  lesson: Types.ObjectId;
   isPresent?: boolean;
-  score?: {
-    kind: "BooleanScore" | "NumberScore";
-    scoreInfo: Types.ObjectId;
-    value: boolean | number;
-  }[];
+  score?: Array<
+    | {
+        kind: "BooleanScore";
+        scoreInfo: Types.ObjectId;
+        value: boolean;
+      }
+    | {
+        kind: "NumberScore";
+        scoreInfo: Types.ObjectId;
+        value: number;
+      }
+  >;
 }
 
 const scoreSchema = new Schema(
@@ -24,8 +28,7 @@ const scoreSchema = new Schema(
 const RollcallSchema = new Schema<IRollcall>(
   {
     register: { type: Schema.Types.ObjectId, ref: "Register", required: true },
-    date: { type: Date, required: true },
-    number: { type: Number, required: true },
+    lesson: { type: Schema.Types.ObjectId, ref: "Lesson", required: true },
     isPresent: { type: Boolean, default: false },
     score: [scoreSchema],
   },
@@ -77,6 +80,58 @@ export default class Rollcall extends GenericModelManager<IRollcall> {
       });
 
       return rollcall;
+    } finally {
+      await mongoose.connection.close();
+    }
+  }
+
+  async createMany(data: IRollcall[]) {
+    if (!Array.isArray(data) || data.length === 0)
+      throw new Error("No data provided for bulk insert.");
+    const registerId = data[0].register;
+
+    if (
+      data.some(
+        (r, i, arr) =>
+          Types.ObjectId.isValid(r.register) === false ||
+          arr[i].register !== registerId
+      )
+    )
+      throw new Error("Invalid or divergent register ID in provided data.");
+
+    try {
+      await mongoose.connect(process.env.MONGODB_URI as string);
+      mongoose.connection.on("error", (err) => {
+        throw err;
+      });
+
+      const docs = await this.model.insertMany(data);
+      const dataToPush = [];
+      for (const doc of docs) {
+        dataToPush.push({
+          id: doc._id,
+          isPresent: doc.isPresent,
+        });
+      }
+
+      const register = new Register();
+
+      const updatedRegister = await register.update({
+        id: registerId,
+        data: {
+          $push: {
+            rollcalls: {
+              $each: dataToPush,
+            },
+          },
+        },
+      });
+
+      if (!updatedRegister) {
+        throw new Error("Failed to update register with rollcalls. Not found.");
+      }
+
+      return docs;
     } finally {
       await mongoose.connection.close();
     }

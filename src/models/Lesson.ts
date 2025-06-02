@@ -5,6 +5,7 @@ import Class from "./Class";
 interface ILesson {
   title?: string;
   date: Date;
+  flag: Types.ObjectId;
   number: number;
   rollcalls?: {
     classId: Types.ObjectId;
@@ -15,6 +16,7 @@ interface ILesson {
 const LessonSchema = new Schema<ILesson>({
   title: String,
   date: { type: Date, required: true },
+  flag: { type: Schema.Types.ObjectId, ref: "Plan", required: true },
   number: { type: Number, required: true },
   rollcalls: [
     {

@@ -1,9 +1,10 @@
-import mongoose, { HydratedDocument, Schema, Types } from "mongoose";
+import mongoose, { Document, HydratedDocument, Schema, Types } from "mongoose";
 import { hashSync } from "bcrypt-ts";
 import GenericModelManager from "@api/services/databaseService";
 import Register from "./Register";
+import dbConnect from "@api/lib/dbConnect";
 
-export interface IUser {
+export interface IUser extends Document {
   role: "teacher" | "admin";
   name?: string;
   plan: Types.ObjectId;
@@ -52,40 +53,26 @@ export default class User extends GenericModelManager<IUser> {
   }
 
   override async create(data: IUser) {
-    try {
-      await mongoose.connect(process.env.MONGODB_URI as string);
-      mongoose.connection.on("error", (err) => {
-        throw err;
+    await dbConnect();
+
+    const user = await this.model.create(data);
+    const register = new Register();
+
+    if (data.register) {
+      await register.update({
+        id: data.register.id,
+        data: {
+          user: user._id,
+        },
       });
-
-      const user = await this.model.create(data);
-      const register = new Register();
-
-      if (data.register) {
-        await register.update({
-          id: data.register.id,
-          data: {
-            user: user._id,
-          },
-        });
-      }
-
-      return user;
-    } finally {
-      await mongoose.connection.close();
     }
+
+    return user;
   }
 
-  async getByEmail(email: string): Promise<HydratedDocument<IUser> | null> {
-    try {
-      await mongoose.connect(process.env.MONGODB_URI as string);
-      mongoose.connection.on("error", (err) => {
-        throw err;
-      });
+  async getByEmail(email: string): Promise<IUser | null> {
+    await dbConnect();
 
-      return await this.model.findOne({ email }).select("+password");
-    } finally {
-      await mongoose.connection.close();
-    }
+    return await this.model.findOne({ email }).select("+password");
   }
 }

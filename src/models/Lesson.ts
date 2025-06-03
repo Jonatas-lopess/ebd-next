@@ -1,8 +1,9 @@
 import GenericModelManager from "@api/services/databaseService";
-import mongoose, { HydratedDocument, Schema, Types } from "mongoose";
+import mongoose, { Document, HydratedDocument, Schema, Types } from "mongoose";
 import Class from "./Class";
+import dbConnect from "@api/lib/dbConnect";
 
-interface ILesson {
+interface ILesson extends Document {
   title?: string;
   date: Date;
   flag: Types.ObjectId;
@@ -28,28 +29,23 @@ const LessonSchema = new Schema<ILesson>({
 
 export default class Lesson extends GenericModelManager<ILesson> {
   constructor() {
-    super(mongoose.models.Lesson || mongoose.model("Lesson", LessonSchema));
+    super(
+      mongoose.models.Lesson || mongoose.model<ILesson>("Lesson", LessonSchema)
+    );
   }
 
   override async create(data: ILesson) {
-    try {
-      await mongoose.connect(process.env.MONGODB_URI as string);
-      mongoose.connection.on("error", (err) => {
-        throw err;
-      });
+    await dbConnect();
 
-      const lesson: HydratedDocument<ILesson> = new this.model(data);
-      const classes = new Class();
-      const classIds = await classes.getIdentifiers();
-      lesson.rollcalls = [];
+    const lesson: HydratedDocument<ILesson> = new this.model(data);
+    const classes = new Class();
+    const classIds = await classes.getIdentifiers();
+    lesson.rollcalls = [];
 
-      for (const classId of classIds) {
-        lesson.rollcalls?.push({ classId, isDone: false });
-      }
-
-      return await lesson.save();
-    } finally {
-      mongoose.connection.close();
+    for (const classId of classIds) {
+      lesson.rollcalls?.push({ classId, isDone: false });
     }
+
+    return await lesson.save();
   }
 }

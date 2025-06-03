@@ -1,7 +1,7 @@
 import GenericModelManager from "@api/services/databaseService";
-import mongoose, { Schema, Types } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
 
-interface IPlan {
+interface IPlan extends Document {
   institution: string;
   superintendent: {
     id: Types.ObjectId;
@@ -39,6 +39,6 @@ const PlanSchema = new Schema<IPlan>(
 
 export default class Plan extends GenericModelManager<IPlan> {
   constructor() {
-    super(mongoose.models.Plan || mongoose.model("Plan", PlanSchema));
+    super(mongoose.models.Plan || mongoose.model<IPlan>("Plan", PlanSchema));
   }
 }

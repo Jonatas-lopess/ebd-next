@@ -1,8 +1,9 @@
 import GenericModelManager from "@api/services/databaseService";
-import mongoose, { Schema, Types } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
 import Class from "./Class";
+import dbConnect from "@api/lib/dbConnect";
 
-interface IRegister {
+interface IRegister extends Document {
   name: string;
   user?: Types.ObjectId;
   class: {
@@ -56,34 +57,27 @@ export default class Register extends GenericModelManager<IRegister> {
     if (Types.ObjectId.isValid(data.class.id) === false)
       throw new Error("Invalid class ID.");
 
-    try {
-      await mongoose.connect(process.env.MONGODB_URI as string);
-      mongoose.connection.on("error", (error) => {
-        throw error;
-      });
+    await dbConnect();
 
-      const register = await this.model.create({
-        ...data,
-        class: {
-          id: data.class.id,
-          name: data.class.name,
-          group: data.class.group,
+    const register = await this.model.create({
+      ...data,
+      class: {
+        id: data.class.id,
+        name: data.class.name,
+        group: data.class.group,
+      },
+    });
+    const _class = new Class();
+
+    if (data.user === undefined) {
+      await _class.update({
+        id: data.class.id,
+        data: {
+          $push: { students: register._id },
         },
       });
-      const _class = new Class();
-
-      if (data.user === undefined) {
-        await _class.update({
-          id: data.class.id,
-          data: {
-            $push: { students: register._id },
-          },
-        });
-      }
-
-      return register;
-    } finally {
-      await mongoose.disconnect();
     }
+
+    return register;
   }
 }

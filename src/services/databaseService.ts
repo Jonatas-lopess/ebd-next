@@ -1,3 +1,4 @@
+import dbConnect from "@api/lib/dbConnect";
 import mongoose, { HydratedDocument, Types, Model } from "mongoose";
 
 export type DatabaseParams<D = any> = {
@@ -21,34 +22,19 @@ export default class GenericModelManager<T> implements IDatabaseService {
   }
 
   async create(data: T): Promise<HydratedDocument<T>> {
-    try {
-      await mongoose.connect(process.env.MONGODB_URI as string);
-      mongoose.connection.on("error", (error) => {
-        throw error;
-      });
-
-      return await this.model.create(data);
-    } finally {
-      await mongoose.disconnect();
-    }
+    await dbConnect();
+    return await this.model.create(data);
   }
 
   async read(
     params?: DatabaseParams<mongoose.RootFilterQuery<T>>,
     select?: string
   ): Promise<any> {
-    try {
-      await mongoose.connect(process.env.MONGODB_URI as string);
-      mongoose.connection.on("error", (error) => {
-        throw error;
-      });
+    await dbConnect();
 
-      if (params?.id) return await this.model.findById(params?.id);
+    if (params?.id) return await this.model.findById(params?.id);
 
-      return await this.model.find(params?.data ?? {}, select);
-    } finally {
-      await mongoose.disconnect();
-    }
+    return await this.model.find(params?.data ?? {}, select);
   }
 
   async update({ id, data }: DatabaseParams<Object>): Promise<any> {
@@ -58,24 +44,17 @@ export default class GenericModelManager<T> implements IDatabaseService {
       });
     if (data === undefined) return null;
 
-    try {
-      await mongoose.connect(process.env.MONGODB_URI as string);
-      mongoose.connection.on("error", (error) => {
-        throw error;
-      });
+    await dbConnect();
 
-      const document = await this.model.findByIdAndUpdate(id, data, {
-        new: true,
-        runValidators: true,
-      });
+    const document = await this.model.findByIdAndUpdate(id, data, {
+      new: true,
+      runValidators: true,
+    });
 
-      if (document === null)
-        throw new Error(`${this.model.modelName} not found.`);
+    if (document === null)
+      throw new Error(`${this.model.modelName} not found.`);
 
-      return document;
-    } finally {
-      await mongoose.disconnect();
-    }
+    return document;
   }
 
   async delete(id: Types.ObjectId | string): Promise<HydratedDocument<T>> {
@@ -84,19 +63,12 @@ export default class GenericModelManager<T> implements IDatabaseService {
         cause: "Invalid identifier.",
       });
 
-    try {
-      await mongoose.connect(process.env.MONGODB_URI as string);
-      mongoose.connection.on("error", (error) => {
-        throw error;
-      });
+    await dbConnect();
 
-      const document = await this.model.findByIdAndDelete(id);
-      if (document === null)
-        throw new Error(`${this.model.modelName} not found.`);
+    const document = await this.model.findByIdAndDelete(id);
+    if (document === null)
+      throw new Error(`${this.model.modelName} not found.`);
 
-      return document;
-    } finally {
-      await mongoose.disconnect();
-    }
+    return document;
   }
 }

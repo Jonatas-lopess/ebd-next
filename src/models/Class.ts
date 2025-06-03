@@ -1,7 +1,8 @@
+import dbConnect from "@api/lib/dbConnect";
 import GenericModelManager from "@api/services/databaseService";
-import mongoose, { Schema, Types } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
 
-interface IClass {
+interface IClass extends Document {
   name: string;
   group?: string;
   flag: Types.ObjectId;
@@ -22,19 +23,15 @@ const ClassSchema = new Schema<IClass>(
 
 export default class Class extends GenericModelManager<IClass> {
   constructor() {
-    super(mongoose.models.Classe || mongoose.model("Classe", ClassSchema));
+    super(
+      mongoose.models.Classe || mongoose.model<IClass>("Classe", ClassSchema)
+    );
   }
 
   async getIdentifiers() {
-    try {
-      await mongoose.connect(process.env.MONGODB_URI as string);
-      mongoose.connection.on("error", (err) => {
-        throw err;
-      });
+    await dbConnect();
 
-      return await this.model.distinct<"_id", Types.ObjectId>("_id");
-    } finally {
-      mongoose.connection.close();
-    }
+    const distinctIds = await this.model.distinct<"_id", Types.ObjectId>("_id");
+    return distinctIds as Types.ObjectId[];
   }
 }

@@ -1,8 +1,9 @@
 import GenericModelManager from "@api/services/databaseService";
-import mongoose, { HydratedDocument, Schema, Types } from "mongoose";
+import mongoose, { Document, HydratedDocument, Schema, Types } from "mongoose";
 import Register from "./Register";
+import dbConnect from "@api/lib/dbConnect";
 
-interface IRollcall {
+interface IRollcall extends Document {
   register: Types.ObjectId;
   lesson: Types.ObjectId;
   isPresent?: boolean;
@@ -59,30 +60,21 @@ export default class Rollcall extends GenericModelManager<IRollcall> {
     if (Types.ObjectId.isValid(data.register) === false)
       throw new Error("Invalid register ID.");
 
-    try {
-      await mongoose.connect(process.env.MONGODB_URI as string);
-      mongoose.connection.on("error", (err) => {
-        throw err;
-      });
+    await dbConnect();
 
-      const rollcall: HydratedDocument<IRollcall> = await this.model.create(
-        data
-      );
-      const register = new Register();
+    const rollcall: HydratedDocument<IRollcall> = await this.model.create(data);
+    const register = new Register();
 
-      await register.update({
-        id: rollcall.register,
-        data: {
-          $push: {
-            rollcalls: { id: rollcall._id, isPresent: rollcall.isPresent },
-          },
+    await register.update({
+      id: rollcall.register,
+      data: {
+        $push: {
+          rollcalls: { id: rollcall._id, isPresent: rollcall.isPresent },
         },
-      });
+      },
+    });
 
-      return rollcall;
-    } finally {
-      await mongoose.connection.close();
-    }
+    return rollcall;
   }
 
   async createMany(data: IRollcall[]) {
@@ -99,41 +91,34 @@ export default class Rollcall extends GenericModelManager<IRollcall> {
     )
       throw new Error("Invalid or divergent register ID in provided data.");
 
-    try {
-      await mongoose.connect(process.env.MONGODB_URI as string);
-      mongoose.connection.on("error", (err) => {
-        throw err;
+    await dbConnect();
+
+    const docs = await this.model.insertMany(data);
+    const dataToPush = [];
+    for (const doc of docs) {
+      dataToPush.push({
+        id: doc._id,
+        isPresent: doc.isPresent,
       });
+    }
 
-      const docs = await this.model.insertMany(data);
-      const dataToPush = [];
-      for (const doc of docs) {
-        dataToPush.push({
-          id: doc._id,
-          isPresent: doc.isPresent,
-        });
-      }
+    const register = new Register();
 
-      const register = new Register();
-
-      const updatedRegister = await register.update({
-        id: registerId,
-        data: {
-          $push: {
-            rollcalls: {
-              $each: dataToPush,
-            },
+    const updatedRegister = await register.update({
+      id: registerId,
+      data: {
+        $push: {
+          rollcalls: {
+            $each: dataToPush,
           },
         },
-      });
+      },
+    });
 
-      if (!updatedRegister) {
-        throw new Error("Failed to update register with rollcalls. Not found.");
-      }
-
-      return docs;
-    } finally {
-      await mongoose.connection.close();
+    if (!updatedRegister) {
+      throw new Error("Failed to update register with rollcalls. Not found.");
     }
+
+    return docs;
   }
 }

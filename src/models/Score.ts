@@ -1,7 +1,7 @@
 import GenericModelManager from "@api/services/databaseService";
-import mongoose, { Schema, Types } from "mongoose";
+import mongoose, { Document, Schema, Types } from "mongoose";
 
-interface IScore {
+interface IScore extends Document {
   title: string;
   flag: Types.ObjectId;
   type: "BooleanScore" | "NumberScore";
@@ -24,6 +24,8 @@ const ScoreSchema = new Schema<IScore>(
 
 export default class Score extends GenericModelManager<IScore> {
   constructor() {
-    super(mongoose.models.Score || mongoose.model("Score", ScoreSchema));
+    super(
+      mongoose.models.Score || mongoose.model<IScore>("Score", ScoreSchema)
+    );
   }
 }

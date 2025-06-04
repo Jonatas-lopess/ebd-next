@@ -1,7 +1,6 @@
-import mongoose, { Schema, Types } from "mongoose";
+import mongoose, { HydratedDocument, Schema, Types } from "mongoose";
 import { hashSync } from "bcrypt-ts";
 import GenericModelManager from "@api/services/databaseService";
-import Register from "./Register";
 import dbConnect from "@api/lib/dbConnect";
 
 export interface IUser {
@@ -52,7 +51,7 @@ export default class User extends GenericModelManager<IUser> {
     super(mongoose.models.User || mongoose.model<IUser>("User", UserSchema));
   }
 
-  async getByEmail(email: string): Promise<IUser | null> {
+  async getByEmail(email: string): Promise<HydratedDocument<IUser> | null> {
     await dbConnect();
 
     return await this.model.findOne({ email }).select("+password");

@@ -1,7 +1,7 @@
 import GenericModelManager from "@api/services/databaseService";
-import mongoose, { Document, Schema, Types } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 
-interface IScore extends Document {
+interface IScore {
   title: string;
   flag: Types.ObjectId;
   type: "BooleanScore" | "NumberScore";

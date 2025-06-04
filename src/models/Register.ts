@@ -1,9 +1,9 @@
 import GenericModelManager from "@api/services/databaseService";
-import mongoose, { Document, Schema, Types } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 import Class from "./Class";
 import dbConnect from "@api/lib/dbConnect";
 
-interface IRegister extends Document {
+interface IRegister {
   name: string;
   user?: Types.ObjectId;
   class: {

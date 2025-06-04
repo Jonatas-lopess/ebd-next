@@ -1,10 +1,10 @@
-import mongoose, { Document, HydratedDocument, Schema, Types } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 import { hashSync } from "bcrypt-ts";
 import GenericModelManager from "@api/services/databaseService";
 import Register from "./Register";
 import dbConnect from "@api/lib/dbConnect";
 
-export interface IUser extends Document {
+export interface IUser {
   role: "teacher" | "admin";
   name?: string;
   plan: Types.ObjectId;
@@ -50,24 +50,6 @@ UserSchema.pre("save", function (next) {
 export default class User extends GenericModelManager<IUser> {
   constructor() {
     super(mongoose.models.User || mongoose.model<IUser>("User", UserSchema));
-  }
-
-  override async create(data: IUser) {
-    await dbConnect();
-
-    const user = await this.model.create(data);
-    const register = new Register();
-
-    if (data.register) {
-      await register.update({
-        id: data.register.id,
-        data: {
-          user: user._id,
-        },
-      });
-    }
-
-    return user;
   }
 
   async getByEmail(email: string): Promise<IUser | null> {

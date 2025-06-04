@@ -1,7 +1,7 @@
 import GenericModelManager from "@api/services/databaseService";
-import mongoose, { Document, Schema, Types } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 
-interface IPlan extends Document {
+interface IPlan {
   institution: string;
   superintendent: {
     id: Types.ObjectId;

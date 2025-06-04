@@ -1,9 +1,9 @@
 import GenericModelManager from "@api/services/databaseService";
-import mongoose, { Document, HydratedDocument, Schema, Types } from "mongoose";
+import mongoose, { HydratedDocument, Schema, Types } from "mongoose";
 import Register from "./Register";
 import dbConnect from "@api/lib/dbConnect";
 
-interface IRollcall extends Document {
+interface IRollcall {
   register: Types.ObjectId;
   lesson: Types.ObjectId;
   isPresent?: boolean;

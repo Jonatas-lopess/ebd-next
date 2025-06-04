@@ -1,9 +1,9 @@
 import GenericModelManager from "@api/services/databaseService";
-import mongoose, { Document, HydratedDocument, Schema, Types } from "mongoose";
+import mongoose, { HydratedDocument, Schema, Types } from "mongoose";
 import Class from "./Class";
 import dbConnect from "@api/lib/dbConnect";
 
-interface ILesson extends Document {
+interface ILesson {
   title?: string;
   date: Date;
   flag: Types.ObjectId;

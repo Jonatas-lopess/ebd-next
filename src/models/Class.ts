@@ -1,8 +1,8 @@
 import dbConnect from "@api/lib/dbConnect";
 import GenericModelManager from "@api/services/databaseService";
-import mongoose, { Document, Schema, Types } from "mongoose";
+import mongoose, { Schema, Types } from "mongoose";
 
-interface IClass extends Document {
+interface IClass {
   name: string;
   group?: string;
   flag: Types.ObjectId;

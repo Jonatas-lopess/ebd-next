@@ -23,6 +23,7 @@ const LessonSchema = new Schema<ILesson>({
     {
       classId: { type: Schema.Types.ObjectId, ref: "Class" },
       isDone: { type: Boolean, default: false },
+      _id: false,
     },
   ],
 });

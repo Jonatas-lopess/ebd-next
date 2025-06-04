@@ -53,23 +53,24 @@ export default class Register extends GenericModelManager<IRegister> {
     );
   }
 
-  override async create(data: IRegister) {
+  override async create(
+    data: Omit<IRegister, "_id" | "user"> & { isTeacher?: boolean }
+  ) {
     if (Types.ObjectId.isValid(data.class.id) === false)
       throw new Error("Invalid class ID.");
 
     await dbConnect();
 
-    const register = await this.model.create({
+    const sanitizedData = {
       ...data,
-      class: {
-        id: data.class.id,
-        name: data.class.name,
-        group: data.class.group,
-      },
-    });
+      ...(data.isTeacher && { user: new Types.ObjectId() }),
+    };
+    delete sanitizedData.isTeacher;
+
+    const register = await this.model.create(sanitizedData);
     const _class = new Class();
 
-    if (data.user === undefined) {
+    if (!data.isTeacher) {
       await _class.update({
         id: data.class.id,
         data: {

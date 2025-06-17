@@ -12,6 +12,7 @@ interface ILesson {
     classId: Types.ObjectId;
     isDone: boolean;
   }[];
+  isFinished?: Date;
 }
 
 const LessonSchema = new Schema<ILesson>({
@@ -26,6 +27,7 @@ const LessonSchema = new Schema<ILesson>({
       _id: false,
     },
   ],
+  isFinished: Date,
 });
 
 export default class Lesson extends GenericModelManager<ILesson> {

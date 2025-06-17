@@ -14,14 +14,9 @@ let cached: MongooseCache = global.mongoose;
 if (!cached) cached = global.mongoose = { conn: null, promise: null };
 
 async function dbConnect(): Promise<Mongoose> {
-  if (cached.conn) {
-    console.log("🚀 Using cached MongoDB connection");
-    return cached.conn;
-  }
+  if (cached.conn) return cached.conn;
 
   if (!cached.promise) {
-    console.log("⏳ Establishing new MongoDB connection...");
-
     cached.promise = mongoose
       .connect(process.env.MONGODB_URI as string, {
         bufferCommands: false,

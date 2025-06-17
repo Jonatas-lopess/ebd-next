@@ -10,7 +10,7 @@ interface IScore {
 
 const ScoreSchema = new Schema<IScore>(
   {
-    title: { type: String, required: true, unique: true },
+    title: { type: String, required: true },
     flag: { type: Schema.Types.ObjectId, ref: "Plan", required: true },
     type: {
       type: String,

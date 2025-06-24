@@ -9,8 +9,11 @@ export type DatabaseParams<D = any> = {
 export interface IDatabaseService {
   readonly model: Model<any>;
   create: (data: any) => Promise<HydratedDocument<any>>;
-  read: (params?: DatabaseParams) => Promise<any>;
-  update: (params: DatabaseParams) => Promise<any>;
+  read: (params?: DatabaseParams, select?: string) => Promise<any>;
+  update: (
+    params: DatabaseParams,
+    options?: mongoose.QueryOptions
+  ) => Promise<any>;
   delete: (id: Types.ObjectId | string) => Promise<HydratedDocument<any>>;
 }
 
@@ -37,7 +40,10 @@ export default class GenericModelManager<T> implements IDatabaseService {
     return await this.model.find(params?.data ?? {}, select);
   }
 
-  async update({ id, data }: DatabaseParams<Object>): Promise<any> {
+  async update(
+    { id, data }: DatabaseParams<Object>,
+    options?: mongoose.QueryOptions<T>
+  ): Promise<any> {
     if (id === undefined)
       throw new Error(`Error updating in model: ${this.model.modelName}`, {
         cause: "Invalid identifier.",
@@ -47,6 +53,7 @@ export default class GenericModelManager<T> implements IDatabaseService {
     await dbConnect();
 
     const document = await this.model.findByIdAndUpdate(id, data, {
+      ...options,
       new: true,
       runValidators: true,
     });

@@ -1,14 +1,15 @@
 import Models from "@api/models";
 import mongoose from "mongoose";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 type RouteParams = {
   params: Promise<{ modelName: string; id: string }>;
 };
 
-export async function GET(req: Request, { params }: RouteParams) {
+export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
     const { modelName, id } = await params;
+    const select = req.nextUrl.searchParams.get("select");
     const db = Models[modelName];
 
     if (!mongoose.isValidObjectId(id))
@@ -17,7 +18,7 @@ export async function GET(req: Request, { params }: RouteParams) {
         { status: 400 }
       );
 
-    const data = await db.read({ id });
+    const data = await db.read({ id }, select ?? undefined);
 
     return NextResponse.json(data ?? {}, { status: 200 });
   } catch (error) {

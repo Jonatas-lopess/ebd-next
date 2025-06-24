@@ -1,11 +1,32 @@
 import Rollcall from "@api/models/Rollcall";
-import { NextResponse } from "next/server";
+import { Types } from "mongoose";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const permittedParams = ["class", "lesson", "register"];
+    const params = req.nextUrl.searchParams;
     const rollcall = new Rollcall();
 
-    const data = await rollcall.read();
+    for (const key of params.keys()) {
+      if (!permittedParams.includes(key)) {
+        throw new Error(`Invalid query parameter: ${key}`);
+      }
+
+      if (Types.ObjectId.isValid(params.get(key) as string)) {
+        throw new Error(`Invalid type of parameter: ${key}`);
+      }
+    }
+
+    const data = await rollcall.read({
+      data: {
+        ...(params.has("register") && {
+          "register.id": params.get("register"),
+        }),
+        ...(params.has("lesson") && { lesson: params.get("lesson") }),
+        ...(params.has("class") && { "register.class": params.get("class") }),
+      },
+    });
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {

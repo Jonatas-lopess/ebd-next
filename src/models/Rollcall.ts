@@ -4,8 +4,16 @@ import Register from "./Register";
 import dbConnect from "@api/lib/dbConnect";
 
 interface IRollcall {
-  register: Types.ObjectId;
-  lesson: Types.ObjectId;
+  register: {
+    id: Types.ObjectId;
+    name: string;
+    class: Types.ObjectId;
+  };
+  lesson: {
+    id: Types.ObjectId;
+    number: number;
+    date: Date;
+  };
   isPresent?: boolean;
   score?: Array<
     | {
@@ -21,6 +29,23 @@ interface IRollcall {
   >;
 }
 
+const registerSchema = new Schema(
+  {
+    id: { type: Schema.Types.ObjectId, ref: "Register", required: true },
+    class: { type: Schema.Types.ObjectId, ref: "Class", required: true },
+  },
+  { _id: false, versionKey: false }
+);
+
+const lessonSchema = new Schema(
+  {
+    id: { type: Schema.Types.ObjectId, ref: "Lesson", required: true },
+    number: { type: Number, required: true },
+    date: { type: Date, required: true },
+  },
+  { _id: false, versionKey: false }
+);
+
 const scoreSchema = new Schema(
   { scoreInfo: { type: Schema.Types.ObjectId, ref: "Score" } },
   { discriminatorKey: "kind", _id: false }
@@ -28,8 +53,8 @@ const scoreSchema = new Schema(
 
 const RollcallSchema = new Schema<IRollcall>(
   {
-    register: { type: Schema.Types.ObjectId, ref: "Register", required: true },
-    lesson: { type: Schema.Types.ObjectId, ref: "Lesson", required: true },
+    register: registerSchema,
+    lesson: lessonSchema,
     isPresent: { type: Boolean, default: false },
     score: [scoreSchema],
   },
@@ -57,8 +82,14 @@ export default class Rollcall extends GenericModelManager<IRollcall> {
   }
 
   override async create(data: IRollcall) {
-    if (Types.ObjectId.isValid(data.register) === false)
+    if (Types.ObjectId.isValid(data.register.id) === false)
       throw new Error("Invalid register ID.");
+
+    if (Types.ObjectId.isValid(data.register.class) === false)
+      throw new Error("Invalid class ID.");
+
+    if (Types.ObjectId.isValid(data.lesson.id) === false)
+      throw new Error("Invalid lesson ID.");
 
     await dbConnect();
 
@@ -66,7 +97,7 @@ export default class Rollcall extends GenericModelManager<IRollcall> {
     const register = new Register();
 
     await register.update({
-      id: rollcall.register,
+      id: rollcall.register.id,
       data: {
         $push: {
           rollcalls: { id: rollcall._id, isPresent: rollcall.isPresent },
@@ -80,13 +111,13 @@ export default class Rollcall extends GenericModelManager<IRollcall> {
   async createMany(data: IRollcall[]) {
     if (!Array.isArray(data) || data.length === 0)
       throw new Error("No data provided for bulk insert.");
-    const registerId = data[0].register;
+    const registerId = data[0].register.id;
 
     if (
       data.some(
         (r, i, arr) =>
-          Types.ObjectId.isValid(r.register) === false ||
-          arr[i].register !== registerId
+          Types.ObjectId.isValid(r.register.id) === false ||
+          arr[i].register.id !== registerId
       )
     )
       throw new Error("Invalid or divergent register ID in provided data.");

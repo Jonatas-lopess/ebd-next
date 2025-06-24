@@ -1,12 +1,22 @@
+import Lesson from "@api/models/Lesson";
 import Rollcall from "@api/models/Rollcall";
+import { Types } from "mongoose";
 import { NextResponse } from "next/server";
+
+type PostBody = {
+  list: Array<any>;
+  lesson: string;
+  class?: string;
+};
 
 export async function POST(req: Request) {
   try {
-    const rawData: Array<any> = await req.json();
+    const rawData: PostBody = await req.json();
+    const lessonId = new Types.ObjectId(rawData.lesson);
     const rollcall = new Rollcall();
+    const lesson = new Lesson();
 
-    const data = rawData.map((e: any) => {
+    const data = rawData.list.map((e: any) => {
       const scoreArray = e.report.map((r: any) => {
         return {
           kind: typeof r.value === "boolean" ? "BooleanScore" : "NumberScore",
@@ -16,14 +26,32 @@ export async function POST(req: Request) {
       });
 
       return {
-        register: e.id,
-        lesson: e.lesson,
+        register: {
+          id: new Types.ObjectId(e.id as string),
+          name: e.name,
+          class: new Types.ObjectId(e.class as string),
+        },
+        lesson: lessonId,
         isPresent: e.isPresent,
         score: scoreArray,
       };
     });
 
     await rollcall.createMany(data);
+
+    if (rawData.class) {
+      await lesson.update(
+        {
+          id: lessonId,
+          data: {
+            $set: { "rollcalls.$[elem].isDone": true },
+          },
+        },
+        {
+          arrayFilters: [{ "elem.classId": new Types.ObjectId(rawData.class) }],
+        }
+      );
+    }
 
     return NextResponse.json(
       {

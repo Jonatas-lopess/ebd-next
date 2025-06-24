@@ -5,14 +5,18 @@ import { NextResponse } from "next/server";
 
 type PostBody = {
   list: Array<any>;
-  lesson: string;
+  lesson: {
+    id: string;
+    number: number;
+    date: Date;
+  };
   class?: string;
 };
 
 export async function POST(req: Request) {
   try {
     const rawData: PostBody = await req.json();
-    const lessonId = new Types.ObjectId(rawData.lesson);
+    const lessonId = new Types.ObjectId(rawData.lesson.id);
     const rollcall = new Rollcall();
     const lesson = new Lesson();
 
@@ -31,7 +35,11 @@ export async function POST(req: Request) {
           name: e.name,
           class: new Types.ObjectId(e.class as string),
         },
-        lesson: lessonId,
+        lesson: {
+          id: lessonId,
+          number: rawData.lesson.number,
+          date: rawData.lesson.date,
+        },
         isPresent: e.isPresent,
         score: scoreArray,
       };

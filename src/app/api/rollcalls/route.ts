@@ -2,29 +2,34 @@ import Rollcall from "@api/models/Rollcall";
 import { Types } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
+function isValidParameter(key: string, value: string): boolean {
+  const permittedParams = ["class", "lesson", "register"];
+
+  return (
+    permittedParams.includes(key) &&
+    ((key === "register" && value === "hasUser") ||
+      Types.ObjectId.isValid(value))
+  );
+}
+
 export async function GET(req: NextRequest) {
   try {
-    const permittedParams = ["class", "lesson", "register"];
-    const params = req.nextUrl.searchParams;
+    const params = Object.fromEntries(req.nextUrl.searchParams.entries());
     const rollcall = new Rollcall();
 
-    for (const key of params.keys()) {
-      if (!permittedParams.includes(key)) {
+    for (const key of Object.keys(params)) {
+      if (!isValidParameter(key, params[key])) {
         throw new Error(`Invalid query parameter: ${key}`);
-      }
-
-      if (Types.ObjectId.isValid(params.get(key) as string)) {
-        throw new Error(`Invalid type of parameter: ${key}`);
       }
     }
 
     const data = await rollcall.read({
       data: {
-        ...(params.has("register") && {
-          "register.id": params.get("register"),
-        }),
-        ...(params.has("lesson") && { lesson: params.get("lesson") }),
-        ...(params.has("class") && { "register.class": params.get("class") }),
+        ...(params["register"] && params["register"] === "hasUser"
+          ? { "register.isTeacher": true }
+          : { "register.id": params["register"] }),
+        ...(params["lesson"] && { lesson: params["lesson"] }),
+        ...(params["class"] && { "register.class": params["class"] }),
       },
     });
 

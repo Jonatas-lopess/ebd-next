@@ -1,13 +1,14 @@
 import GenericModelManager from "@api/services/databaseService";
 import mongoose, { HydratedDocument, Schema, Types } from "mongoose";
-import Register from "./Register";
 import dbConnect from "@api/lib/dbConnect";
+import Register from "./Register";
 
 interface IRollcall {
   register: {
     id: Types.ObjectId;
     name: string;
     class: Types.ObjectId;
+    isTeacher?: boolean;
   };
   lesson: {
     id: Types.ObjectId;
@@ -33,6 +34,7 @@ const registerSchema = new Schema(
   {
     id: { type: Schema.Types.ObjectId, ref: "Register", required: true },
     class: { type: Schema.Types.ObjectId, ref: "Class", required: true },
+    isTeacher: { type: Boolean, default: false },
   },
   { _id: false, versionKey: false }
 );

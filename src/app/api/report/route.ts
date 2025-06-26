@@ -9,6 +9,7 @@ type PostBody = {
     id: string;
     number: number;
     date: Date;
+    isFinished?: boolean;
   };
   class?: string;
 };
@@ -47,7 +48,7 @@ export async function POST(req: Request) {
 
     await rollcall.createMany(data);
 
-    if (rawData.class) {
+    if (rawData.class && rawData.lesson.isFinished !== true) {
       await lesson.update(
         {
           id: lessonId,
@@ -60,6 +61,9 @@ export async function POST(req: Request) {
         }
       );
     }
+
+    if (rawData.lesson.isFinished)
+      await lesson.update({ id: lessonId, data: { isFinished: true } });
 
     return NextResponse.json(
       {

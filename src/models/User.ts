@@ -4,7 +4,7 @@ import GenericModelManager from "@api/services/databaseService";
 import dbConnect from "@api/lib/dbConnect";
 
 export interface IUser {
-  role: "teacher" | "admin";
+  role: "teacher" | "admin" | "owner";
   name?: string;
   plan: Types.ObjectId;
   register?: {
@@ -30,7 +30,7 @@ const registerSchema = new Schema(
 );
 
 const UserSchema = new Schema<IUser>({
-  role: { type: String, enum: ["teacher", "admin"], required: true },
+  role: { type: String, enum: ["teacher", "admin", "owner"], required: true },
   name: String,
   plan: { type: Schema.Types.ObjectId, ref: "Plan", required: true },
   register: registerSchema,

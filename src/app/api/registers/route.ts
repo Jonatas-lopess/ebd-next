@@ -1,24 +1,19 @@
-import Models from "@api/models";
+import Register from "@api/models/Register";
 import { NextRequest, NextResponse } from "next/server";
 
-type RouteParams = {
-  params: Promise<{ modelName: string }>;
-};
-
-export function generateStaticParams() {
-  return Object.keys(Models).map((modelName) => ({
-    modelName,
-  }));
-}
-
-export const dynamicParams = false;
-
-export async function GET(req: NextRequest, { params }: RouteParams) {
+export async function GET(req: NextRequest) {
   try {
-    const { modelName } = await params;
-    const db = Models[modelName];
+    const hasUser = req.nextUrl.searchParams.get("hasUser");
+    const classFilter = req.nextUrl.searchParams.get("class");
+    const db = new Register();
 
-    const result = await db.read();
+    const result = await db.read({
+      data: {
+        ...(hasUser === "true" && { user: { $exists: true, $ne: null } }),
+        ...(hasUser === "false" && { user: { $exists: false } }),
+        ...(classFilter && { "class.id": classFilter }),
+      },
+    });
 
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
@@ -37,11 +32,10 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
   }
 }
 
-export async function POST(req: Request, { params }: RouteParams) {
+export async function POST(req: Request) {
   try {
-    const { modelName } = await params;
     const body = await req.json();
-    const db = Models[modelName];
+    const db = new Register();
 
     const data = await db.create(body);
 

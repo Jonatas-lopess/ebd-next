@@ -1,5 +1,4 @@
 import Class from "./Class";
-import Register from "./Register";
 import Score from "./Score";
 import Plan from "./Plan";
 import { IDatabaseService } from "@api/services/databaseService";
@@ -12,7 +11,6 @@ interface IModels {
 const Models: IModels = {
   plans: new Plan(),
   classes: new Class(),
-  registers: new Register(),
   scores: new Score(),
   lessons: new Lesson(),
 };

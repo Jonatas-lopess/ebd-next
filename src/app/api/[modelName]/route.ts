@@ -19,8 +19,14 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     const hasUser = req.nextUrl.searchParams.get("hasUser");
     const db = Models[modelName];
 
+    function dataObjectConstructor() {
+      if (hasUser === "true") return { user: { $exists: true, $ne: null } };
+      if (hasUser === "false") return { user: { $exists: false } };
+      return {};
+    }
+
     const result = await db.read({
-      data: hasUser ? { user: { $exists: true, $ne: null } } : {},
+      data: dataObjectConstructor(),
     });
 
     return NextResponse.json(result, { status: 200 });

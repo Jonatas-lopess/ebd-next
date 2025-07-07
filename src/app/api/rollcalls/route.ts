@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
         ...(params["register"] && params["register"] === "hasUser"
           ? { "register.isTeacher": true }
           : { "register.id": params["register"] }),
-        ...(params["lesson"] && { lesson: params["lesson"] }),
+        ...(params["lesson"] && { "lesson.id": params["lesson"] }),
         ...(params["class"] && { "register.class": params["class"] }),
       },
     });

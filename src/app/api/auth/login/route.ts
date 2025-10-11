@@ -40,7 +40,16 @@ export async function POST(req: Request) {
       .sign(new TextEncoder().encode(process.env.JWT_SECRET as string));
 
     return NextResponse.json(
-      { message: "Logged in successfully.", token },
+      {
+        message: "Logged in successfully.",
+        token,
+        user: {
+          email: user.email,
+          role: user.role,
+          name: user.name ? user.name : user.register?.name,
+          plan: user.plan,
+        },
+      },
       { status: 200 }
     );
   } catch (error) {

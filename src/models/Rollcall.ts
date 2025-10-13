@@ -113,43 +113,32 @@ export default class Rollcall extends GenericModelManager<IRollcall> {
   async createMany(data: IRollcall[]) {
     if (!Array.isArray(data) || data.length === 0)
       throw new Error("No data provided for bulk insert.");
-    const registerId = data[0].register.id;
 
-    if (
-      data.some(
-        (r, i, arr) =>
-          Types.ObjectId.isValid(r.register.id) === false ||
-          arr[i].register.id !== registerId
-      )
-    )
-      throw new Error("Invalid or divergent register ID in provided data.");
+    if (data.some((r) => Types.ObjectId.isValid(r.register.id) === false))
+      throw new Error("Invalid register ID in provided data.");
 
     await dbConnect();
 
     const docs = await this.model.insertMany(data);
-    const dataToPush = [];
-    for (const doc of docs) {
-      dataToPush.push({
-        id: doc._id,
-        isPresent: doc.isPresent,
-      });
-    }
-
     const register = new Register();
 
-    const updatedRegister = await register.update({
-      id: registerId,
-      data: {
-        $push: {
-          rollcalls: {
-            $each: dataToPush,
-          },
-        },
-      },
-    });
+    if (docs.length === 0) {
+      throw new Error("No rollcall documents were created.");
+    }
 
-    if (!updatedRegister) {
-      throw new Error("Failed to update register with rollcalls. Not found.");
+    const updateRegistersPromise = docs.map((doc) =>
+      register.update({
+        id: doc.register.id,
+        data: {
+          $push: { rollcalls: { id: doc._id, isPresent: doc.isPresent } },
+        },
+      })
+    );
+
+    const updatedRegisters = await Promise.all(updateRegistersPromise);
+
+    if (!updatedRegisters) {
+      throw new Error("Failed to update registers with rollcalls.");
     }
 
     return docs;

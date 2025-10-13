@@ -3,7 +3,19 @@ import mongoose, { HydratedDocument, Schema, Types } from "mongoose";
 import dbConnect from "@api/lib/dbConnect";
 import Register from "./Register";
 
-interface IRollcall {
+export type ScoreType =
+  | {
+      kind: "BooleanScore";
+      scoreInfo: Types.ObjectId;
+      value: boolean;
+    }
+  | {
+      kind: "NumberScore";
+      scoreInfo: Types.ObjectId;
+      value: number;
+    };
+
+export interface IRollcall {
   register: {
     id: Types.ObjectId;
     name: string;
@@ -16,18 +28,7 @@ interface IRollcall {
     date: Date;
   };
   isPresent?: boolean;
-  score?: Array<
-    | {
-        kind: "BooleanScore";
-        scoreInfo: Types.ObjectId;
-        value: boolean;
-      }
-    | {
-        kind: "NumberScore";
-        scoreInfo: Types.ObjectId;
-        value: number;
-      }
-  >;
+  score?: Array<ScoreType>;
 }
 
 const registerSchema = new Schema(

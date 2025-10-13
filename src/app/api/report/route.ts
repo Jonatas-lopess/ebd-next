@@ -21,6 +21,8 @@ export async function POST(req: Request) {
     const rollcall = new Rollcall();
     const lesson = new Lesson();
 
+    console.log(rawData); // Debugging line to check incoming data
+
     const data = rawData.list.map((e: any) => {
       const scoreArray = e.report.map((r: any) => {
         return {

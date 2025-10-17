@@ -39,16 +39,13 @@ export async function POST(req: Request) {
       .setExpirationTime("8h")
       .sign(new TextEncoder().encode(process.env.JWT_SECRET as string));
 
+    const { password: _, ...userWithoutPassword } = user;
+
     return NextResponse.json(
       {
         message: "Logged in successfully.",
         token,
-        user: {
-          email: user.email,
-          role: user.role,
-          name: user.name ? user.name : user.register?.name,
-          plan: user.plan,
-        },
+        user: userWithoutPassword,
       },
       { status: 200 }
     );

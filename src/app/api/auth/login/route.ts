@@ -39,7 +39,7 @@ export async function POST(req: Request) {
       .setExpirationTime("8h")
       .sign(new TextEncoder().encode(process.env.JWT_SECRET as string));
 
-    const { password: _, ...userWithoutPassword } = user;
+    const { password: _, __v, ...userWithoutPassword } = user.toObject();
 
     return NextResponse.json(
       {

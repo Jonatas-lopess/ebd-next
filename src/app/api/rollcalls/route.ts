@@ -23,16 +23,17 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    const data = await rollcall.read({
-      data: {
-        ...(params["register"] && params["register"] === "hasUser"
+    const searchData: any = {
+      ...(params["register"] &&
+        (params["register"] === "hasUser"
           ? { "register.isTeacher": true }
-          : { "register.id": params["register"] }),
-        ...(params["lesson"] && { "lesson.id": params["lesson"] }),
-        ...(params["class"] && { "register.class": params["class"] }),
-      },
-    });
-    console.log(params, data); // Debug log
+          : { "register.id": params["register"] })),
+      ...(params["lesson"] && { "lesson.id": params["lesson"] }),
+      ...(params["class"] && { "register.class": params["class"] }),
+    };
+
+    const data = await rollcall.read({ data: searchData });
+    console.log(searchData, data); // Debug log
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
     console.error(error);

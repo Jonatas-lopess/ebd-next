@@ -32,7 +32,7 @@ export async function GET(req: NextRequest) {
         ...(params["class"] && { "register.class": params["class"] }),
       },
     });
-
+    console.log(params, data); // Debug log
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
     console.error(error);

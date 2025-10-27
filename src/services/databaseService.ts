@@ -14,7 +14,7 @@ export interface IDatabaseService {
     params: DatabaseParams,
     options?: mongoose.QueryOptions
   ) => Promise<any>;
-  delete: (id: Types.ObjectId | string) => Promise<HydratedDocument<any>>;
+  delete: (id: Types.ObjectId | string) => Promise<any>;
 }
 
 export default class GenericModelManager<T> implements IDatabaseService {
@@ -35,9 +35,9 @@ export default class GenericModelManager<T> implements IDatabaseService {
   ): Promise<any> {
     await dbConnect();
 
-    if (params?.id) return await this.model.findById(params?.id);
+    if (params?.id) return await this.model.findById(params?.id).lean<T>();
 
-    return await this.model.find(params?.data ?? {}, select);
+    return await this.model.find(params?.data ?? {}, select).lean<T>();
   }
 
   async update(
@@ -52,11 +52,13 @@ export default class GenericModelManager<T> implements IDatabaseService {
 
     await dbConnect();
 
-    const document = await this.model.findByIdAndUpdate(id, data, {
-      ...options,
-      new: true,
-      runValidators: true,
-    });
+    const document = await this.model
+      .findByIdAndUpdate(id, data, {
+        ...options,
+        new: true,
+        runValidators: true,
+      })
+      .lean<T>();
 
     if (document === null)
       throw new Error(`${this.model.modelName} not found.`);
@@ -64,7 +66,7 @@ export default class GenericModelManager<T> implements IDatabaseService {
     return document;
   }
 
-  async delete(id: Types.ObjectId | string): Promise<HydratedDocument<T>> {
+  async delete(id: Types.ObjectId | string): Promise<T> {
     if (id === undefined)
       throw new Error(`Error deleting in model: ${this.model.modelName}`, {
         cause: "Invalid identifier.",
@@ -72,7 +74,7 @@ export default class GenericModelManager<T> implements IDatabaseService {
 
     await dbConnect();
 
-    const document = await this.model.findByIdAndDelete(id);
+    const document = await this.model.findByIdAndDelete(id).lean<T>();
     if (document === null)
       throw new Error(`${this.model.modelName} not found.`);
 

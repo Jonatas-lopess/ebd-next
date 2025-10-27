@@ -1,6 +1,5 @@
 import Class from "@api/models/Class";
 import Lesson, { ILesson } from "@api/models/Lesson";
-import { HydratedDocument } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -11,7 +10,7 @@ export async function GET(req: NextRequest) {
 
     if (lessonFilter) {
       const lesson = new Lesson();
-      const lessonData: HydratedDocument<ILesson> = await lesson.read({
+      const lessonData: ILesson = await lesson.read({
         id: lessonFilter,
       });
 

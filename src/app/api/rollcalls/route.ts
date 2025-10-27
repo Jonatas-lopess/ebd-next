@@ -33,7 +33,7 @@ export async function GET(req: NextRequest) {
     };
 
     const data = await rollcall.read({ data: searchData });
-    console.log(searchData, data); // Debug log
+
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
     console.error(error);

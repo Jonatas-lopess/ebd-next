@@ -65,7 +65,7 @@ export async function PUT(req: Request, { params }: RouteParams) {
   }
 }
 
-export async function DELETE({ params }: RouteParams) {
+export async function DELETE(req: Request, { params }: RouteParams) {
   try {
     const { id } = await params;
     const db = new Class();

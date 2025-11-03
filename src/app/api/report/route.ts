@@ -35,6 +35,7 @@ export async function POST(req: Request) {
           id: new Types.ObjectId(e.id as string),
           name: e.name,
           class: new Types.ObjectId(e.class as string),
+          isTeacher: e.isTeacher,
         },
         lesson: {
           id: lessonId,

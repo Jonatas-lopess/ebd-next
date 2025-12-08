@@ -14,6 +14,7 @@ function isValidParameter(key: string, value: string): boolean {
 
 export async function GET(req: NextRequest) {
   try {
+    const plan = req.headers.get("plan")!;
     const params = Object.fromEntries(req.nextUrl.searchParams.entries());
     const rollcall = new Rollcall();
 
@@ -30,6 +31,7 @@ export async function GET(req: NextRequest) {
           : { "register.id": params["register"] })),
       ...(params["lesson"] && { "lesson.id": params["lesson"] }),
       ...(params["class"] && { "register.class": params["class"] }),
+      flag: plan,
     };
 
     const data = await rollcall.read({ data: searchData });
@@ -53,14 +55,18 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: Request) {
   try {
+    const plan = req.headers.get("plan")!;
     const rollcall = new Rollcall();
     const body = await req.json();
 
     if (Array.isArray(body)) {
+      body.forEach((item) => Object.assign(item, { flag: plan }));
       const data = await rollcall.createMany(body);
 
       return NextResponse.json(data, { status: 201 });
     }
+
+    Object.assign(body, { flag: plan });
 
     const data = await rollcall.create(body);
 

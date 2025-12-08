@@ -28,6 +28,7 @@ export interface IRollcall {
     date: Date;
   };
   isPresent?: boolean;
+  flag: Types.ObjectId;
   score?: Array<ScoreType>;
 }
 
@@ -58,6 +59,7 @@ const RollcallSchema = new Schema<IRollcall>(
   {
     register: registerSchema,
     lesson: lessonSchema,
+    flag: { type: Schema.Types.ObjectId, ref: "Plan", required: true },
     isPresent: { type: Boolean, default: false },
     score: [scoreSchema],
   },

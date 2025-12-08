@@ -6,6 +6,7 @@ import dbConnect from "@api/lib/dbConnect";
 interface IRegister {
   name: string;
   user?: Types.ObjectId;
+  flag: Types.ObjectId;
   class: {
     id: Types.ObjectId;
     name: string;
@@ -37,6 +38,7 @@ const RegisterSchema = new Schema<IRegister>(
   {
     name: { type: String, required: true },
     user: { type: Schema.Types.ObjectId, ref: "User" },
+    flag: { type: Schema.Types.ObjectId, ref: "Plan", required: true },
     class: classSchema,
     rollcalls: [rollcallSchema],
     aniversary: String,

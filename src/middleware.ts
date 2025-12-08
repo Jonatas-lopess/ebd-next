@@ -29,6 +29,7 @@ export default async function middleware(req: NextRequest) {
 
     const headers = new Headers(req.headers);
     headers.set("userid", payload.userId as string);
+    headers.set("plan", payload.plan as string);
 
     const modifiedReq = new Request(req.url, {
       headers,

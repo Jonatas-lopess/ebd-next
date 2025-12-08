@@ -16,6 +16,7 @@ type PostBody = {
 
 export async function POST(req: Request) {
   try {
+    const plan = req.headers.get("plan")!;
     const rawData: PostBody = await req.json();
     const lessonId = new Types.ObjectId(rawData.lesson.id);
     const rollcall = new Rollcall();
@@ -43,6 +44,7 @@ export async function POST(req: Request) {
           date: rawData.lesson.date,
         },
         isPresent: e.isPresent,
+        flag: new Types.ObjectId(plan),
         score: scoreArray,
       };
     });

@@ -4,24 +4,27 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
+    const planId = req.headers.get("plan")!;
+    const userId = req.headers.get("userid")!;
     const user = new User();
     const plan = new Plan();
-    const urlIdParam = req.nextUrl.searchParams.get("id");
     const typeParam = req.nextUrl.searchParams.get("type");
 
-    if (!urlIdParam || !typeParam) {
+    if (!typeParam) {
       throw new Error("Missing parameters.");
     }
 
-    const params = urlIdParam.split(".");
-    const planData = await plan.read({ id: params[0] });
-    const userData = await user.read({ id: params[1] });
+    const planData = await plan.read({ id: planId });
+    const userData = await user.read({ id: userId });
 
     if (!planData || !userData || planData.id !== userData.plan) {
       throw new Error("Wrong parameters.");
     }
 
-    if (typeParam === "administrator" && userData.role !== "owner") {
+    if (
+      typeParam === "administrator" &&
+      userData._id !== planData.superintendent.id
+    ) {
       throw new Error("Permission denied.");
     }
 

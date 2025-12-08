@@ -4,8 +4,9 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
+    const plan = req.headers.get("plan")!;
     const lessonFilter = req.nextUrl.searchParams.get("lesson");
-    let searchData = undefined;
+    let searchData: Object = { flag: plan };
     const db = new Class();
 
     if (lessonFilter) {
@@ -13,6 +14,9 @@ export async function GET(req: NextRequest) {
       const lessonData: ILesson = await lesson.read({
         id: lessonFilter,
       });
+
+      if (lessonData.flag.toString() !== plan)
+        throw new Error("Lesson does not belong to the specified plan.");
 
       lessonData &&
         lessonData.rollcalls &&

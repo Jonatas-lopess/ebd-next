@@ -14,6 +14,7 @@ export interface IUser {
     aniversary?: string;
     phone?: string;
   };
+  recoveryToken: string;
   email: string;
   password: string;
 }
@@ -34,6 +35,7 @@ const UserSchema = new Schema<IUser>({
   name: String,
   plan: { type: Schema.Types.ObjectId, ref: "Plan", required: true },
   register: registerSchema,
+  recoveryToken: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true, select: false },
 });

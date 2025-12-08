@@ -9,11 +9,14 @@ interface IPlan {
     email: string;
   };
   headquarter?: Types.ObjectId;
+  planToken: string;
+  administratorToken?: string;
+  teacherToken?: string;
   price: number;
-  isActive: boolean;
+  isActive?: boolean;
   createdAt?: Date;
   updatedAt?: Date;
-  expiresAt?: Date;
+  expiresAt: Date;
 }
 
 const superintendentSchema = new Schema(
@@ -31,6 +34,9 @@ const PlanSchema = new Schema<IPlan>(
     superintendent: superintendentSchema,
     headquarter: { type: Schema.Types.ObjectId, ref: "Plan" },
     price: { type: Number, required: true },
+    planToken: { type: String, required: true },
+    administratorToken: String,
+    teacherToken: String,
     expiresAt: { type: Date, required: true },
     isActive: { type: Boolean, default: true },
   },

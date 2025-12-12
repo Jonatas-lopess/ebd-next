@@ -2,8 +2,10 @@ import GenericModelManager from "@api/services/databaseService";
 import mongoose, { Schema, Types } from "mongoose";
 import Class from "./Class";
 import dbConnect from "@api/lib/dbConnect";
+import User from "./User";
 
-interface IRegister {
+export interface IRegister {
+  _id?: Types.ObjectId;
   name: string;
   user?: Types.ObjectId;
   flag: Types.ObjectId;
@@ -82,5 +84,26 @@ export default class Register extends GenericModelManager<IRegister> {
     }
 
     return register;
+  }
+
+  override async delete(id: Types.ObjectId | string): Promise<IRegister> {
+    if (id === undefined)
+      throw new Error(`Error deleting in model: ${this.model.modelName}`, {
+        cause: "Invalid identifier.",
+      });
+
+    await dbConnect();
+
+    const document = await this.model.findByIdAndDelete(id).lean<IRegister>();
+    if (document === null)
+      throw new Error(`${this.model.modelName} not found.`);
+
+    if (document.user) {
+      const user = new User();
+
+      await user.delete(document.user);
+    }
+
+    return document;
   }
 }

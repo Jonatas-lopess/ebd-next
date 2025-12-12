@@ -1,15 +1,94 @@
-import User from "@api/models/User";
+import Plan, { IPlan } from "@api/models/Plan";
+import Register, { IRegister } from "@api/models/Register";
+import User, { IUser } from "@api/models/User";
+import { SignJWT } from "jose";
+import { Types } from "mongoose";
 import { NextResponse } from "next/server";
+
+type RequestBody = {
+  code: string;
+  name: string;
+  email: string;
+  password: string;
+};
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const reqBody: RequestBody = await req.json();
     const db = new User();
+    const plan = new Plan();
+    const register = new Register();
+    let objToCreate: IUser | undefined = undefined;
 
-    const user = await db.create(body);
+    const [role, id] = Buffer.from(reqBody.code, "base64")
+      .toString("utf-8")
+      .split(":");
+
+    if (role === "owner") {
+      const planData: IPlan = await plan.read({ id });
+      if (!planData || !planData.isActive || planData.superintendent)
+        throw new Error();
+
+      objToCreate = {
+        name: reqBody.name,
+        email: reqBody.email,
+        password: reqBody.password,
+        role: role,
+        plan: new Types.ObjectId(id),
+      };
+    }
+
+    if (role === "admin") {
+      const planData: IPlan = await plan.read({ id });
+      if (!planData || !planData.isActive) throw new Error();
+
+      objToCreate = {
+        name: reqBody.name,
+        email: reqBody.email,
+        password: reqBody.password,
+        role: role,
+        plan: new Types.ObjectId(id),
+      };
+    }
+
+    if (role === "teacher") {
+      const registerData: IRegister = await register.read({
+        data: { user: id },
+      });
+      if (!registerData) throw new Error();
+
+      objToCreate = {
+        _id: new Types.ObjectId(id),
+        name: reqBody.name,
+        email: reqBody.email,
+        password: reqBody.password,
+        role: role,
+        plan: registerData.flag,
+        register: {
+          id: registerData._id!,
+          name: reqBody.name,
+          class: registerData.class.id,
+          ...(registerData.aniversary && {
+            aniversary: registerData.aniversary,
+          }),
+          ...(registerData.phone && { phone: registerData.phone }),
+        },
+      };
+    }
+
+    if (!objToCreate) throw new Error();
+
+    const user = await db.create(objToCreate);
+
+    const token = await new SignJWT({ userId: user.id, plan: user.plan })
+      .setProtectedHeader({ alg: "HS256" })
+      .setExpirationTime("8h")
+      .sign(new TextEncoder().encode(process.env.JWT_SECRET as string));
+
+    const { password: _, __v, ...userWithoutPassword } = user.toObject();
 
     return NextResponse.json(
-      { message: "Sign up successfully.", userId: user.id },
+      { message: "Sign up successfully.", token, user: userWithoutPassword },
       { status: 201 }
     );
   } catch (error) {

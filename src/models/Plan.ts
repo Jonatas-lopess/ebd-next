@@ -1,7 +1,7 @@
 import GenericModelManager from "@api/services/databaseService";
 import mongoose, { Schema, Types } from "mongoose";
 
-interface IPlan {
+export interface IPlan {
   institution: string;
   superintendent: {
     id: Types.ObjectId;
@@ -9,9 +9,7 @@ interface IPlan {
     email: string;
   };
   headquarter?: Types.ObjectId;
-  planToken: string;
-  administratorToken?: string;
-  teacherToken?: string;
+  planToken?: string;
   price: number;
   isActive?: boolean;
   createdAt?: Date;
@@ -34,9 +32,7 @@ const PlanSchema = new Schema<IPlan>(
     superintendent: superintendentSchema,
     headquarter: { type: Schema.Types.ObjectId, ref: "Plan" },
     price: { type: Number, required: true },
-    planToken: { type: String, required: true },
-    administratorToken: String,
-    teacherToken: String,
+    planToken: String,
     expiresAt: { type: Date, required: true },
     isActive: { type: Boolean, default: true },
   },

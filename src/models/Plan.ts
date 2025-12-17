@@ -2,6 +2,7 @@ import GenericModelManager from "@api/services/databaseService";
 import mongoose, { Schema, Types } from "mongoose";
 
 export interface IPlan {
+  _id?: Types.ObjectId;
   institution: string;
   superintendent: {
     id: Types.ObjectId;

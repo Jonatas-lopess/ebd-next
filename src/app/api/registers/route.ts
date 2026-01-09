@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
-    const plan = req.headers.get("plan")!;
+    const plan = req.headers.get("x-plan")!;
     const hasUser = req.nextUrl.searchParams.get("hasUser");
     const classFilter = req.nextUrl.searchParams.get("class");
     const db = new Register();
@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: Request) {
   try {
-    const plan = req.headers.get("plan")!;
+    const plan = req.headers.get("x-plan")!;
     const body = await req.json();
     const db = new Register();
 

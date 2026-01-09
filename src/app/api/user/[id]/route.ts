@@ -7,7 +7,7 @@ type RouteParams = {
 
 export async function DELETE(req: NextRequest, { params }: RouteParams) {
   try {
-    const userId = req.headers.get("userid")!;
+    const userId = req.headers.get("x-userid")!;
     const { id } = await params;
     const db = new User();
 

@@ -15,10 +15,14 @@ export const dynamicParams = false;
 
 export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
+    const plan = req.headers.get("x-plan")!;
     const { modelName } = await params;
     const db = Models[modelName];
+    let data = {};
 
-    const result = await db.read();
+    if (modelName !== "plans") data = { flag: plan };
+
+    const result = await db.read({ data });
 
     return NextResponse.json(result, { status: 200 });
   } catch (error) {

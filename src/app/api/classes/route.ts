@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
-    const plan = req.headers.get("plan")!;
+    const plan = req.headers.get("x-plan")!;
     const lessonFilter = req.nextUrl.searchParams.get("lesson");
     let searchData: Object = { flag: plan };
     const db = new Class();

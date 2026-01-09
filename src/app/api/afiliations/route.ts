@@ -10,7 +10,7 @@ type RequestBody = {
 
 export async function GET(req: NextRequest) {
   try {
-    const plan = req.headers.get("plan")!;
+    const plan = req.headers.get("x-plan")!;
     const db = new Afiliation();
     const planObj = new Plan();
 
@@ -38,7 +38,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: Request) {
   try {
-    const planId = req.headers.get("plan")!;
+    const planId = req.headers.get("x-plan")!;
     const { type, identifier }: RequestBody = await req.json();
     const db = new Afiliation();
     const plan = new Plan();

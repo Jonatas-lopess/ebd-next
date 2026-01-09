@@ -16,7 +16,7 @@ type PostBody = {
 
 export async function POST(req: Request) {
   try {
-    const plan = req.headers.get("plan")!;
+    const plan = req.headers.get("x-plan")!;
     const rawData: PostBody = await req.json();
     const lessonId = new Types.ObjectId(rawData.lesson.id);
     const rollcall = new Rollcall();

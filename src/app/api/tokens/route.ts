@@ -4,8 +4,8 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
   try {
-    const planId = req.headers.get("plan")!;
-    const userId = req.headers.get("userid")!;
+    const planId = req.headers.get("x-plan")!;
+    const userId = req.headers.get("x-userid")!;
     const user = new User();
     const plan = new Plan();
     const typeParam = req.nextUrl.searchParams.get("type");

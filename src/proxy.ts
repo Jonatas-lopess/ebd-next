@@ -11,8 +11,9 @@ export default async function middleware(req: NextRequest) {
 
   try {
     const token = req.headers.get("authorization")?.split(" ")[1];
+    const secret = process.env.JWT_SECRET;
 
-    if (token === undefined) {
+    if (!token) {
       return NextResponse.json(
         {
           message:
@@ -22,30 +23,31 @@ export default async function middleware(req: NextRequest) {
       );
     }
 
+    if (!secret) {
+      console.error("Missing JWT_SECRET environment variable in middleware");
+      return NextResponse.json(
+        { message: "Server misconfiguration: JWT secret missing." },
+        { status: 500 }
+      );
+    }
+
     const { payload } = await jwtVerify(
       token,
-      new TextEncoder().encode(process.env.JWT_SECRET as string)
+      new TextEncoder().encode(secret)
     );
 
     const headers = new Headers(req.headers);
-    headers.set("userid", payload.userId as string);
-    headers.set("plan", payload.plan as string);
+    headers.set("x-userid", String((payload as any)?.userId ?? ""));
+    headers.set("x-plan", String((payload as any)?.plan ?? ""));
 
-    const modifiedReq = new Request(req.url, {
-      headers,
-      body: req.body,
-      method: req.method,
-      redirect: req.redirect,
-    });
+    return NextResponse.next({ request: { headers } });
+  } catch (error: any) {
+    console.error("JWT verification failed:", error);
 
-    return NextResponse.next({ request: modifiedReq });
-  } catch (error) {
+    const message = error?.message ?? "You tried to access a resource without permission or valid token.";
+    
     return NextResponse.json(
-      {
-        message:
-          "You tried to access a resource without permission or valid token.",
-        error,
-      },
+      { message, error: String(error) },
       { status: 403 }
     );
   }

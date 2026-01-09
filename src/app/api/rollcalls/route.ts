@@ -14,7 +14,7 @@ function isValidParameter(key: string, value: string): boolean {
 
 export async function GET(req: NextRequest) {
   try {
-    const plan = req.headers.get("plan")!;
+    const plan = req.headers.get("x-plan")!;
     const params = Object.fromEntries(req.nextUrl.searchParams.entries());
     const rollcall = new Rollcall();
 
@@ -55,7 +55,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: Request) {
   try {
-    const plan = req.headers.get("plan")!;
+    const plan = req.headers.get("x-plan")!;
     const rollcall = new Rollcall();
     const body = await req.json();
 

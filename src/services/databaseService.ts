@@ -4,6 +4,7 @@ import mongoose, { HydratedDocument, Types, Model } from "mongoose";
 export type DatabaseParams<D = any> = {
   id?: Types.ObjectId | string;
   data?: D;
+  single?: boolean;
 };
 
 export interface IDatabaseService {
@@ -11,7 +12,7 @@ export interface IDatabaseService {
   create: (data: any) => Promise<HydratedDocument<any>>;
   read: (params?: DatabaseParams, select?: string) => Promise<any>;
   update: (
-    params: DatabaseParams,
+    params: Required<Omit<DatabaseParams, "single">>,
     options?: mongoose.QueryOptions
   ) => Promise<any>;
   delete: (id: Types.ObjectId | string) => Promise<any>;
@@ -35,21 +36,15 @@ export default class GenericModelManager<T> implements IDatabaseService {
   ): Promise<any> {
     await dbConnect();
 
-    if (params?.id) return await this.model.findById(params?.id).lean<T>();
-
+    if (params?.id) return await this.model.findById(params.id).lean<T>();
+    if (params?.single) return await this.model.findOne(params.data, select).lean<T>();
     return await this.model.find(params?.data ?? {}, select).lean<T>();
   }
 
   async update(
-    { id, data }: DatabaseParams<Object>,
+    { id, data }: Required<Omit<DatabaseParams<Object>, "single">>,
     options?: mongoose.QueryOptions<T>
   ): Promise<any> {
-    if (id === undefined)
-      throw new Error(`Error updating in model: ${this.model.modelName}`, {
-        cause: "Invalid identifier.",
-      });
-    if (data === undefined) return null;
-
     await dbConnect();
 
     const document = await this.model

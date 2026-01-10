@@ -53,10 +53,11 @@ export async function POST(req: Request) {
     }
 
     if (role === "teacher") {
-      const registerData: IRegister = await register.read({
-        data: { user: id },
-      });
+      const registerData = await register.read({ data: { user: id }, single: true });
+
       if (!registerData) throw new HttpError(400, "Register not found.");
+      if (!registerData.class || !registerData.class.id)
+        throw new HttpError(400, "Register does not have an associated class.");
 
       objToCreate = {
         _id: new Types.ObjectId(id),

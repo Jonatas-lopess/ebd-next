@@ -78,7 +78,7 @@ export async function POST(req: Request) {
 
     const user = await db.create(objToCreate);
 
-    const token = await new SignJWT({ userId: user.id, plan: user.plan })
+    const token = await new SignJWT({ userId: user.id, plan: user.plan.toString() })
       .setProtectedHeader({ alg: "HS256" })
       .setExpirationTime("8h")
       .sign(new TextEncoder().encode(process.env.JWT_SECRET as string));

@@ -1,6 +1,7 @@
 import Class from "@api/models/Class";
 import Lesson, { ILesson } from "@api/models/Lesson";
 import { NextRequest, NextResponse } from "next/server";
+import { HttpError, handleApiError } from "@api/lib/apiError";
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,7 +17,7 @@ export async function GET(req: NextRequest) {
       });
 
       if (lessonData.flag.toString() !== plan)
-        throw new Error("Lesson does not belong to the specified plan.");
+        throw new HttpError(403, "Lesson does not belong to the specified plan.");
 
       lessonData &&
         lessonData.rollcalls &&
@@ -29,18 +30,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      {
-        message: "An error occurred while processing your request.",
-        error: {
-          message: (error as Error).message,
-          type: (error as Error).name,
-          details: error,
-        },
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
@@ -53,17 +43,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json(data, { status: 201 });
   } catch (err) {
-    console.error(err);
-    return NextResponse.json(
-      {
-        message: "An error occurred while processing your request.",
-        error: {
-          message: (err as Error).message,
-          type: (err as Error).name,
-          details: err,
-        },
-      },
-      { status: 500 }
-    );
+    return handleApiError(err);
   }
 }

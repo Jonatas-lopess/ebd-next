@@ -1,5 +1,6 @@
 import User from "@api/models/User";
 import { NextRequest, NextResponse } from "next/server";
+import { HttpError, handleApiError } from "@api/lib/apiError";
 
 export async function GET(req: NextRequest) {
   try {
@@ -10,10 +11,7 @@ export async function GET(req: NextRequest) {
     const user = await db.read({ id: userId });
 
     if (!user || user.role !== "owner") {
-      return NextResponse.json(
-        { message: "Unauthorized access." },
-        { status: 401 }
-      );
+      throw new HttpError(403, "Unauthorized access.");
     }
 
     const admins = await db.read({ data: { role: "admin", plan } });
@@ -23,10 +21,6 @@ export async function GET(req: NextRequest) {
       { status: 200 }
     );
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { message: "An error occurred while processing your request.", error },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

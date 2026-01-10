@@ -1,6 +1,7 @@
 import Models from "@api/models";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
+import { HttpError, handleApiError } from "@api/lib/apiError";
 
 type RouteParams = {
   params: Promise<{ modelName: string; id: string }>;
@@ -12,28 +13,13 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     const select = req.nextUrl.searchParams.get("select");
     const db = Models[modelName];
 
-    if (!mongoose.isValidObjectId(id))
-      return NextResponse.json(
-        { message: "Invalid ID format." },
-        { status: 400 }
-      );
+    if (!mongoose.isValidObjectId(id)) throw new HttpError(400, "Invalid ID format.");
 
     const data = await db.read({ id }, select ?? undefined);
 
     return NextResponse.json(data ?? {}, { status: 200 });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      {
-        message: "An error occurred while processing your request.",
-        error: {
-          message: (error as Error).message,
-          type: (error as Error).name,
-          details: error,
-        },
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
@@ -50,18 +36,7 @@ export async function PUT(req: Request, { params }: RouteParams) {
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      {
-        message: "An error occurred while processing your request.",
-        error: {
-          message: (error as Error).message,
-          type: (error as Error).name,
-          details: error,
-        },
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
@@ -77,17 +52,6 @@ export async function DELETE(req: Request, { params }: RouteParams) {
       { status: 200 }
     );
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      {
-        message: "An error occurred while processing your request.",
-        error: {
-          message: (error as Error).message,
-          type: (error as Error).name,
-          details: error,
-        },
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

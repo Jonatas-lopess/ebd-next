@@ -4,6 +4,7 @@ import User, { IUser } from "@api/models/User";
 import { SignJWT } from "jose";
 import { Types } from "mongoose";
 import { NextResponse } from "next/server";
+import { HttpError, handleApiError } from "@api/lib/apiError";
 
 type RequestBody = {
   code: string;
@@ -27,7 +28,7 @@ export async function POST(req: Request) {
     if (role === "owner") {
       const planData: IPlan = await plan.read({ id });
       if (!planData || !planData.isActive || planData.superintendent)
-        throw new Error();
+        throw new HttpError(400, "Invalid plan or plan already has a superintendent.");
 
       objToCreate = {
         name: reqBody.name,
@@ -40,7 +41,7 @@ export async function POST(req: Request) {
 
     if (role === "admin") {
       const planData: IPlan = await plan.read({ id });
-      if (!planData || !planData.isActive) throw new Error();
+      if (!planData || !planData.isActive) throw new HttpError(400, "Invalid plan.");
 
       objToCreate = {
         name: reqBody.name,
@@ -55,7 +56,7 @@ export async function POST(req: Request) {
       const registerData: IRegister = await register.read({
         data: { user: id },
       });
-      if (!registerData) throw new Error();
+      if (!registerData) throw new HttpError(400, "Register not found.");
 
       objToCreate = {
         _id: new Types.ObjectId(id),
@@ -68,15 +69,11 @@ export async function POST(req: Request) {
           id: registerData._id!,
           name: reqBody.name,
           class: registerData.class.id,
-          ...(registerData.aniversary && {
-            aniversary: registerData.aniversary,
-          }),
-          ...(registerData.phone && { phone: registerData.phone }),
         },
       };
     }
 
-    if (!objToCreate) throw new Error();
+    if (!objToCreate) throw new HttpError(400, "Invalid sign up code.");
 
     const user = await db.create(objToCreate);
 
@@ -92,9 +89,6 @@ export async function POST(req: Request) {
       { status: 201 }
     );
   } catch (error) {
-    return NextResponse.json(
-      { message: "An error occurred while processing your request.", error },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

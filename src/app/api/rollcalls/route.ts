@@ -1,3 +1,4 @@
+import { handleApiError, HttpError } from "@api/lib/apiError";
 import Rollcall from "@api/models/Rollcall";
 import { Types } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
@@ -20,7 +21,7 @@ export async function GET(req: NextRequest) {
 
     for (const key of Object.keys(params)) {
       if (!isValidParameter(key, params[key])) {
-        throw new Error(`Invalid query parameter: ${key}`);
+        throw new HttpError(400, `Invalid query parameter: ${key}`);
       }
     }
 
@@ -38,18 +39,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(data, { status: 200 });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      {
-        message: "An error occurred while processing your request.",
-        error: {
-          message: (error as Error).message,
-          type: (error as Error).name,
-          details: error,
-        },
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
@@ -72,17 +62,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json(data, { status: 201 });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      {
-        message: "An error occurred while processing your request.",
-        error: {
-          message: (error as Error).message,
-          type: (error as Error).name,
-          details: error,
-        },
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

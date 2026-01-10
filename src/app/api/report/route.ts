@@ -2,6 +2,7 @@ import Lesson from "@api/models/Lesson";
 import Rollcall, { IRollcall, ScoreType } from "@api/models/Rollcall";
 import { Types } from "mongoose";
 import { NextResponse } from "next/server";
+import { handleApiError } from "@api/lib/apiError";
 
 type PostBody = {
   list: Array<any>;
@@ -76,17 +77,6 @@ export async function POST(req: Request) {
       { status: 201 }
     );
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      {
-        message: "An error occurred while processing your request.",
-        error: {
-          message: (error as Error).message,
-          type: (error as Error).name,
-          details: error,
-        },
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

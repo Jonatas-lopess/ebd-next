@@ -1,5 +1,6 @@
 import User from "@api/models/User";
 import { NextResponse } from "next/server";
+import { HttpError, handleApiError } from "@api/lib/apiError";
 
 export async function GET(req: Request) {
   try {
@@ -7,16 +8,13 @@ export async function GET(req: Request) {
     const db = new User();
 
     if (!userId) {
-      return NextResponse.json(
-        { message: "Error retrieving userId." },
-        { status: 400 }
-      );
+      throw new HttpError(400, "Error retrieving userId.");
     }
 
     const user = await db.read({ id: userId });
 
     if (!user) {
-      return NextResponse.json({ message: "User not found." }, { status: 404 });
+      throw new HttpError(404, "User not found.");
     }
 
     return NextResponse.json(
@@ -24,10 +22,6 @@ export async function GET(req: Request) {
       { status: 200 }
     );
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { message: "An error occurred while processing your request.", error },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

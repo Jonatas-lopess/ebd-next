@@ -1,5 +1,6 @@
 import User from "@api/models/User";
 import { NextRequest, NextResponse } from "next/server";
+import { HttpError, handleApiError } from "@api/lib/apiError";
 
 type RouteParams = {
   params: Promise<{ id: string }>;
@@ -14,7 +15,7 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
     const user = await db.read({ id: userId });
 
     if (!user || user.role !== "owner") {
-      throw new Error("Access denied.");
+      throw new HttpError(403, "Access denied.");
     }
 
     const deletedUser = await db.delete(id);
@@ -24,10 +25,6 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
       { status: 200 }
     );
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { message: "An error occurred while processing your request.", error },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

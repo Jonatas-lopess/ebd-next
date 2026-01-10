@@ -1,6 +1,7 @@
 import Plan from "@api/models/Plan";
 import User from "@api/models/User";
 import { NextRequest, NextResponse } from "next/server";
+import { HttpError, handleApiError } from "@api/lib/apiError";
 
 export async function GET(req: NextRequest) {
   try {
@@ -11,21 +12,21 @@ export async function GET(req: NextRequest) {
     const typeParam = req.nextUrl.searchParams.get("type");
 
     if (!typeParam) {
-      throw new Error("Missing parameters.");
+      throw new HttpError(400, "Missing parameters.");
     }
 
     const planData = await plan.read({ id: planId });
     const userData = await user.read({ id: userId });
 
     if (!planData || !userData || planData.id !== userData.plan) {
-      throw new Error("Wrong parameters.");
+      throw new HttpError(400, "Wrong parameters.");
     }
 
     if (
       typeParam === "administrator" &&
       userData._id !== planData.superintendent.id
     ) {
-      throw new Error("Permission denied.");
+      throw new HttpError(403, "Permission denied.");
     }
 
     const result = {
@@ -38,17 +39,6 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      {
-        message: "An error occurred while processing your request.",
-        error: {
-          message: (error as Error).message,
-          type: (error as Error).name,
-          details: error,
-        },
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }

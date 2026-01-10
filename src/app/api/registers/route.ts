@@ -1,5 +1,6 @@
 import Register from "@api/models/Register";
 import { NextRequest, NextResponse } from "next/server";
+import { handleApiError } from "@api/lib/apiError";
 
 export async function GET(req: NextRequest) {
   try {
@@ -19,18 +20,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(result, { status: 200 });
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      {
-        message: "An error occurred while processing your request.",
-        error: {
-          message: (error as Error).message,
-          type: (error as Error).name,
-          details: error,
-        },
-      },
-      { status: 500 }
-    );
+    return handleApiError(error);
   }
 }
 
@@ -46,17 +36,6 @@ export async function POST(req: Request) {
 
     return NextResponse.json(data, { status: 201 });
   } catch (err) {
-    console.error(err);
-    return NextResponse.json(
-      {
-        message: "An error occurred while processing your request.",
-        error: {
-          message: (err as Error).message,
-          type: (err as Error).name,
-          details: err,
-        },
-      },
-      { status: 500 }
-    );
+    return handleApiError(err);
   }
 }

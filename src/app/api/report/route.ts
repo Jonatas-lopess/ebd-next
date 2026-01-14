@@ -1,58 +1,33 @@
 import Lesson from "@api/models/Lesson";
-import Rollcall, { IRollcall, ScoreType } from "@api/models/Rollcall";
+import Rollcall, { IRollcall } from "@api/models/Rollcall";
 import { Types } from "mongoose";
 import { NextResponse } from "next/server";
-import { handleApiError } from "@api/lib/apiError";
+import { handleApiError, HttpError } from "@api/lib/apiError";
 
 type PostBody = {
-  list: Array<any>;
-  lesson: {
-    id: string;
-    number: number;
-    date: Date;
-    isFinished?: boolean;
-  };
-  class?: string;
+  list: Array<IRollcall>;
+  isFinished: boolean;
 };
 
 export async function POST(req: Request) {
   try {
     const plan = req.headers.get("x-plan")!;
     const rawData: PostBody = await req.json();
-    const lessonId = new Types.ObjectId(rawData.lesson.id);
+    const lessonId = rawData.list[0].lesson.id;
+    const classId = rawData.list[0].register.class;
     const rollcall = new Rollcall();
     const lesson = new Lesson();
 
-    const data: IRollcall[] = rawData.list.map((e: any) => {
-      const scoreArray: Array<ScoreType> = e.report.map((r: any) => {
-        return {
-          kind: typeof r.value === "boolean" ? "BooleanScore" : "NumberScore",
-          scoreInfo: r.id,
-          value: r.value,
-        };
-      });
+    const data = rawData.list;
 
-      return {
-        register: {
-          id: new Types.ObjectId(e.id as string),
-          name: e.name,
-          class: new Types.ObjectId(e.class as string),
-          isTeacher: e.isTeacher,
-        },
-        lesson: {
-          id: lessonId,
-          number: rawData.lesson.number,
-          date: rawData.lesson.date,
-        },
-        isPresent: e.isPresent,
-        flag: new Types.ObjectId(plan),
-        score: scoreArray,
-      };
+    data.forEach((item) => {
+      if (String(item.flag) !== plan) throw new HttpError(403, `Unauthorized action on item ${item._id}.`);
+      if (String(item.lesson.id) !== lessonId.toString()) throw new HttpError(400, `Invalid lesson ID on item ${item._id}.`);
     });
 
     await rollcall.createMany(data);
 
-    if (rawData.class && rawData.lesson.isFinished !== true) {
+    if (rawData.isFinished === false) {
       await lesson.update(
         {
           id: lessonId,
@@ -61,12 +36,12 @@ export async function POST(req: Request) {
           },
         },
         {
-          arrayFilters: [{ "elem.classId": new Types.ObjectId(rawData.class) }],
+          arrayFilters: [{ "elem.classId": new Types.ObjectId(classId) }],
         }
       );
     }
 
-    if (rawData.lesson.isFinished)
+    if (rawData.isFinished)
       await lesson.update({ id: lessonId, data: { isFinished: Date.now() } });
 
     return NextResponse.json(

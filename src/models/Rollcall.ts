@@ -16,6 +16,7 @@ export type ScoreType =
     };
 
 export interface IRollcall {
+  _id?: Types.ObjectId;
   register: {
     id: Types.ObjectId;
     name: string;

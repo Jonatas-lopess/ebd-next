@@ -39,11 +39,11 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function DELETE(req: NextRequest, body: Request) {
+export async function DELETE(req: NextRequest) {
   try {
     const userId = req.headers.get("x-userid");
     const planId = req.headers.get("x-plan")!;
-    const { password } = await body.json();
+    const { password } = await req.json();
     const db = new User();
     const plan = new Plan();
 

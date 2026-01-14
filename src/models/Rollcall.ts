@@ -35,6 +35,7 @@ export interface IRollcall {
 const registerSchema = new Schema(
   {
     id: { type: Schema.Types.ObjectId, ref: "Register", required: true },
+    name: { type: String, required: true },
     class: { type: Schema.Types.ObjectId, ref: "Class", required: true },
     isTeacher: { type: Boolean, default: false },
   },

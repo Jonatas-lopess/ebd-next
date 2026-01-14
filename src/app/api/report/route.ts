@@ -50,7 +50,6 @@ export async function POST(req: Request) {
       };
     });
 
-    console.log(data); // Debugging line to check the data being processed
     await rollcall.createMany(data);
 
     if (rawData.class && rawData.lesson.isFinished !== true) {

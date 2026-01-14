@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { HttpError, handleApiError } from "@api/lib/apiError";
 import { compare } from "bcrypt-ts";
 import Plan, { IPlan } from "@api/models/Plan";
+import Register from "@api/models/Register";
 
 export async function GET(req: NextRequest) {
   try {
@@ -46,6 +47,7 @@ export async function DELETE(req: NextRequest) {
     const { password } = await req.json();
     const db = new User();
     const plan = new Plan();
+    const register = new Register();
 
     if (!userId || !password || !planId)
       throw new HttpError(400, "Lack of required parameters.");
@@ -72,6 +74,12 @@ export async function DELETE(req: NextRequest) {
     if (!isPasswordValid) throw new HttpError(422, "Invalid credentials.");
 
     const deletedUser = await db.delete(userId);
+    if (requestingUser.role === "teacher") {
+      await register.update({
+        id: deletedUser._id!,
+        data: { user: undefined },
+      });
+    }
 
     return NextResponse.json(
       { message: "User deleted successfully.", deletedUser },

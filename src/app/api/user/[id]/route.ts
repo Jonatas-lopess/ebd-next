@@ -1,4 +1,4 @@
-import User from "@api/models/User";
+import User, { IUser } from "@api/models/User";
 import { NextRequest, NextResponse } from "next/server";
 import { HttpError, handleApiError } from "@api/lib/apiError";
 
@@ -13,8 +13,13 @@ export async function DELETE(req: NextRequest, { params }: RouteParams) {
     const db = new User();
 
     const user = await db.read({ id: userId });
+    const userToDelete: IUser = await db.read({ id });
 
-    if (!user || user.role !== "owner") {
+    if (!userToDelete) {
+      throw new HttpError(404, "User to delete not found.");
+    }
+
+    if (!user || (userToDelete.role === "admin" && user.role !== "owner")) {
       throw new HttpError(403, "Access denied.");
     }
 

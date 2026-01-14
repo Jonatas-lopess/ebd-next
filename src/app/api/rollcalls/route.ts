@@ -7,7 +7,7 @@ function isValidParameter(key: string, value: string): boolean {
   const permittedParams = ["class", "lesson", "register", "hasUser"];
 
   return permittedParams.includes(key) &&
-    (key === "hasUser" && (value === "true" || value === "false")) &&
+    (key === "hasUser" && (value === "true" || value === "false")) ||
     (key !== "hasUser" && Types.ObjectId.isValid(value))
 }
 

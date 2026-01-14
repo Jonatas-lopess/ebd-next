@@ -4,13 +4,11 @@ import { Types } from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
 function isValidParameter(key: string, value: string): boolean {
-  const permittedParams = ["class", "lesson", "register"];
+  const permittedParams = ["class", "lesson", "register", "hasUser"];
 
-  return (
-    permittedParams.includes(key) &&
-    ((key === "register" && value === "hasUser") ||
-      Types.ObjectId.isValid(value))
-  );
+  return permittedParams.includes(key) &&
+    (key === "hasUser" && (value === "true" || value === "false")) &&
+    (key !== "hasUser" && Types.ObjectId.isValid(value))
 }
 
 export async function GET(req: NextRequest) {
@@ -26,12 +24,10 @@ export async function GET(req: NextRequest) {
     }
 
     const searchData: any = {
-      ...(params["register"] &&
-        (params["register"] === "hasUser"
-          ? { "register.isTeacher": true }
-          : { "register.id": params["register"] })),
+      ...(params["register"] && { "register.id": params["register"] }),
       ...(params["lesson"] && { "lesson.id": params["lesson"] }),
       ...(params["class"] && { "register.class": params["class"] }),
+      ...(params["hasUser"] && { "register.isTeacher": params["hasUser"] === "true" }),
       flag: plan,
     };
 

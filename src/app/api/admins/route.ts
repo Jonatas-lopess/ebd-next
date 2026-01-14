@@ -14,12 +14,9 @@ export async function GET(req: NextRequest) {
       throw new HttpError(403, "Unauthorized access.");
     }
 
-    const admins = await db.read({ data: { role: "admin", plan } });
+    const data = await db.read({ data: { role: "admin", plan } });
 
-    return NextResponse.json(
-      { message: "Admins data found successfully.", admins },
-      { status: 200 }
-    );
+    return NextResponse.json(data, { status: 200 });
   } catch (error) {
     return handleApiError(error);
   }
